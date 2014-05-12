@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserGen", "ParserGenerator\ParserGen.csproj", "{9ECD6F8A-46C7-42CD-9EE7-6EBECD8AEFC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9ECD6F8A-46C7-42CD-9EE7-6EBECD8AEFC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ECD6F8A-46C7-42CD-9EE7-6EBECD8AEFC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ECD6F8A-46C7-42CD-9EE7-6EBECD8AEFC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ECD6F8A-46C7-42CD-9EE7-6EBECD8AEFC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
