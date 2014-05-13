@@ -54,7 +54,12 @@ namespace ParserGen.Parse
             Scan();
 
             ParseSyntaxExpression(_expressionTable[ROOT_EXPRESSION], tokens);
-            
+
+            if (_currentToken != null)
+            {
+                throw new Exception("Syntax error. Unexpected token: " + _currentToken);
+            }
+
             return tokens;
         }
 

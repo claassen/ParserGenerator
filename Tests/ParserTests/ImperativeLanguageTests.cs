@@ -41,5 +41,13 @@ namespace Tests.ParserTests
 
             var tokens = parser.Parse("BEGIN x = 1; y = 2 END");
         }
+
+        [TestMethod]
+        public void ImperativeLanguageTest_Valid_NoThrow()
+        {
+            var parser = CreateParser();
+
+            var tokens = parser.Parse("BEGIN x = 1; y = 2; END");
+        }
     }
 }
