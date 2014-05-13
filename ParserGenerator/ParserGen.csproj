@@ -44,15 +44,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generator\SyntaxParsing\SyntaxExpression.cs" />
-    <Compile Include="Generator\SyntaxParsing\SyntaxTokens.cs" />
-    <Compile Include="Parse\Tokens\DefaultLanguageTokenCreator.cs" />
-    <Compile Include="Parse\Tokens\ILanguageToken.cs" />
-    <Compile Include="Parse\Tokens\ILanguageTokenCreator.cs" />
-    <Compile Include="Parse\Parser.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarExpression.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarTokens.cs" />
+    <Compile Include="Parser\Tokens\DefaultLanguageTokenCreator.cs" />
+    <Compile Include="Parser\Tokens\ILanguageToken.cs" />
+    <Compile Include="Parser\Tokens\ILanguageTokenCreator.cs" />
+    <Compile Include="Parser\LanguageParser.cs" />
     <Compile Include="Generator\ParserGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Generator\SyntaxParsing\SyntaxParser.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

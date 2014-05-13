@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
-using ParserGen.Parse;
+using ParserGen.Parser;
 
 namespace Tests.ParserTests
 {
@@ -21,7 +21,7 @@ namespace Tests.ParserTests
             @"REGEX:NUMBER       = [0-9]+"
         };
 
-        private Parser CreateParser()
+        private LanguageParser CreateParser()
         {
             ParserGenerator generator = new ParserGenerator();
 

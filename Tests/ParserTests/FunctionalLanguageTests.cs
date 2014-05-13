@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
-using ParserGen.Generator.SyntaxParsing;
-using ParserGen.Parse;
+using ParserGen.Generator.GrammarParsing;
+using ParserGen.Parser;
 
 namespace Tests
 {
@@ -26,7 +26,7 @@ namespace Tests
             @"LOGICAL_OP         = ('<'|'>'|'<='|'>=')"
         };
 
-        private Parser CreateParser()
+        private LanguageParser CreateParser()
         {
             ParserGenerator generator = new ParserGenerator();
 

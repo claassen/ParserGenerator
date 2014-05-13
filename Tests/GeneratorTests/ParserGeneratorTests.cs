@@ -11,17 +11,13 @@ namespace Tests.GeneratorTests
     [TestClass]
     public class ParserGeneratorTests
     {
-        //[TestMethod]
-        //[ExpectedException(typeof(Exception))]
-        //public void ParserGeneratorTest_NonUniqueStartExpressions()
-        //{
-        //    string expression1 = "'(' A ')'";
-        //    string expression2 = "'(' B ')'";
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ParserGeneratorTest_InvalidExpression()
+        {
+            ParserGenerator generator = new ParserGenerator();
 
-        //    ParserGenerator generator = new ParserGenerator();
-
-        //    generator.AddExpression(expression1);
-        //    generator.AddExpression(expression2);
-        //}
+            generator.AddExpression("SOMETHING");
+        }
     }
 }
