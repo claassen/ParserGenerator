@@ -53,6 +53,7 @@
     <Compile Include="GeneratorTests\ParserGeneratorTests.cs" />
     <Compile Include="ParserTests\ImperativeLanguageTests.cs" />
     <Compile Include="ParserTests\FunctionalLanguageTests.cs" />
+    <Compile Include="ParserTests\LL_k_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

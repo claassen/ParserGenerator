@@ -33,7 +33,7 @@ namespace ParserGen.Generator
 
         public Parser GetParser(ILanguageTokenCreator tokenCreator)
         {
-            ValidateSyntaxExpressions();
+            //ValidateSyntaxExpressions();
 
             return new Parser(_expressionTable, tokenCreator);
         }

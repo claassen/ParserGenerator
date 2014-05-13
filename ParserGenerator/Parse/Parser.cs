@@ -158,6 +158,9 @@ namespace ParserGen.Parse
         {
             bool globalSuccess = false;
 
+            string SAVED_INPUT = _input;
+            string SAVED_TOKEN = _currentToken;
+
             while (true)
             {
                 bool success = false;
@@ -166,10 +169,21 @@ namespace ParserGen.Parse
                 {
                     if (IsMatch(t))
                     {
-                        ParseSyntaxToken(t, tokens);
-                        success = true;
-                        globalSuccess = true;
-                        break;
+                        var matchTokens = new List<ILanguageToken>();
+                        try
+                        {
+                            ParseSyntaxToken(t, matchTokens);
+                            tokens.AddRange(matchTokens);
+                            success = true;
+                            globalSuccess = true;
+                            break;
+                        }
+                        catch
+                        {
+                            //Backtrack
+                            _input = SAVED_INPUT;
+                            _currentToken = SAVED_TOKEN;
+                        }
                     }
                 }
 
