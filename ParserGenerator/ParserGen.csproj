@@ -45,8 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\GrammarParsing\GrammarExpression.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\GrammarParserLanguageInterpreter.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GrammarParserLanguageTokens.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GrammarParserTokenCreator.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarTokens.cs" />
     <Compile Include="Parser\Tokens\DefaultLanguageTokenCreator.cs" />
+    <Compile Include="Parser\Tokens\DefaultLanguageToken.cs" />
     <Compile Include="Parser\Tokens\ILanguageToken.cs" />
     <Compile Include="Parser\Tokens\ILanguageTokenCreator.cs" />
     <Compile Include="Parser\LanguageParser.cs" />
@@ -57,6 +61,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

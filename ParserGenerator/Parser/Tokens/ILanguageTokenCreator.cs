@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace ParserGen.Parser
 {
-    public abstract class ILanguageTokenCreator
+    public interface ILanguageTokenCreator
     {
-        public abstract string RootExpressionName();
-        public abstract ILanguageToken Create(string expressionName, string expressionValue);
+        string RootExpressionName();
+        ILanguageToken Create(string literalToken);
+        ILanguageToken Create(string expressionName, string expressionValue);
+        ILanguageToken Create(string expressionName, List<ILanguageToken> tokens);
     }
 }

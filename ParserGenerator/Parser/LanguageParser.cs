@@ -93,15 +93,16 @@ namespace ParserGen.Parser
                     ParseSyntaxToken(exprToken, subTokens);
                 }
 
-                tokens.Add(new ILanguageSubToken() { Name = expression.Name, Tokens = subTokens });
+                tokens.Add(_tokenCreator.Create(expression.Name, subTokens));
+                //tokens.Add(new ILanguageSubToken() { Name = expression.Name, Tokens = subTokens });
             }
         }
 
         private void ParseSyntaxToken(IGrammarToken exprToken, List<ILanguageToken> tokens)
         {
-            if (exprToken is SubGrammarToken)
+            if (exprToken is TokenListGrammarToken)
             {
-                ParseSubSyntaxToken((SubGrammarToken)exprToken, tokens);
+                ParseTokenListSyntaxToken((TokenListGrammarToken)exprToken, tokens);
             }
             else if (exprToken is ExpressionGrammarToken)
             {
@@ -111,26 +112,19 @@ namespace ParserGen.Parser
             {
                 ParseLiteralSyntaxToken((LiteralGrammarToken)exprToken, tokens);
             }
-            else if (exprToken is MultipleOptionGrammarToken)
+            else if (exprToken is GroupGrammarToken)
             {
-                ParseMultipleOptionSyntaxToken((MultipleOptionGrammarToken)exprToken, tokens);
+                ParseGroupSyntaxToken((GroupGrammarToken)exprToken, tokens);
             }
         }
 
-        private void ParseSubSyntaxToken(SubGrammarToken exprToken, List<ILanguageToken> tokens)
+        private void ParseTokenListSyntaxToken(TokenListGrammarToken exprToken, List<ILanguageToken> tokens)
         {
             foreach (IGrammarToken t in exprToken.Tokens)
             {
                 if (!IsMatch(t))
                 {
-                    if (exprToken.IsOptional)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        throw new Exception("Syntax error. Expecting: " + t.ToString());
-                    }
+                    throw new Exception("Syntax error. Expecting: " + t.ToString());
                 }
 
                 ParseSyntaxToken(t, tokens);
@@ -154,12 +148,12 @@ namespace ParserGen.Parser
             //TODO: let user provided TokenCreator decide what to exclude
             if (_currentToken != "(" && _currentToken != ")" && _currentToken != ",")
             {
-                tokens.Add(_tokenCreator.Create("LiteralToken", _currentToken));
+                tokens.Add(_tokenCreator.Create(_currentToken));
             }
             Scan();
         }
 
-        private void ParseMultipleOptionSyntaxToken(MultipleOptionGrammarToken exprToken, List<ILanguageToken> tokens)
+        private void ParseGroupSyntaxToken(GroupGrammarToken exprToken, List<ILanguageToken> tokens)
         {
             bool globalSuccess = false;
 
@@ -198,7 +192,7 @@ namespace ParserGen.Parser
                 }
             }
 
-            if (!globalSuccess && exprToken.RepeatType != TokenRepeatType.ZeroOrMore)
+            if (!globalSuccess && (exprToken.RepeatType != TokenRepeatType.ZeroOrMore && exprToken.RepeatType != TokenRepeatType.Optional))
             {
                 throw new Exception("Syntax error. Expecting: " + exprToken.ToString());
             }
@@ -206,9 +200,9 @@ namespace ParserGen.Parser
 
         private bool IsMatch(IGrammarToken token)
         {
-            if (token is SubGrammarToken)
+            if (token is TokenListGrammarToken)
             {
-                return IsMatch(((SubGrammarToken)token).Tokens[0]);
+                return IsMatch(((TokenListGrammarToken)token).Tokens[0]);
             }
             else if (token is ExpressionGrammarToken)
             {
@@ -229,11 +223,12 @@ namespace ParserGen.Parser
             {
                 return _currentToken == ((LiteralGrammarToken)token).Text;
             }
-            else if(token is MultipleOptionGrammarToken)
+            else if(token is GroupGrammarToken)
             {
+                GroupGrammarToken groupToken = (GroupGrammarToken)token;
                 bool match = false;
 
-                foreach (IGrammarToken t in ((MultipleOptionGrammarToken)token).Tokens)
+                foreach (IGrammarToken t in groupToken.Tokens)
                 {
                     if (IsMatch(t))
                     {
@@ -242,7 +237,9 @@ namespace ParserGen.Parser
                     }
                 }
 
-                return match;
+                return match || 
+                       groupToken.RepeatType == TokenRepeatType.Optional || 
+                       groupToken.RepeatType == TokenRepeatType.ZeroOrMore;
             }
 
             throw new Exception("Unknown SyntaxToken type");

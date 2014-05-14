@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ParserGen.Generator.GrammarParsing.GrammarParserLanguage;
+using ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens;
+using ParserGen.Parser;
 
 namespace ParserGen.Generator.GrammarParsing
 {
@@ -11,6 +14,167 @@ namespace ParserGen.Generator.GrammarParsing
     {
         private string _input;
         private string _currentToken;
+
+        //Documentation only
+        private readonly string[] Expressions2 = new string[]
+        {
+            //@"GRAMMAR = (EXPRESSION)+",
+            @"EXPRESSION = IDENTIFIER '=' TOKEN_LIST",
+            @"REGEX:IDENTIFIER = (REGEX:)?[A-Z_]+",
+            @"TOKEN_LIST = (TOKEN)+",
+            @"TOKEN = (EXPR_NAME|LITERAL_TOKEN|GROUP_TOKEN)",
+            @"REGEX:EXPR_NAME = [A-Z_]+",
+            @"REGEX:LITERAL_TOKEN = '..*'",
+            @"GROUP_TOKEN = '(' TOKEN_LIST ('|' TOKEN_LIST)* ')' "
+        };
+
+        private List<GrammarExpression> GetGrammarParserGrammarExpressions()
+        {
+            var expressions = new List<GrammarExpression>()
+            {
+                //new GrammarExpression()
+                //{
+                //    Name = "GRAMMAR",
+                //    Tokens = new List<IGrammarToken>()
+                //    {
+                //        new MultipleOptionGrammarToken()
+                //        {
+                //            RepeatType = TokenRepeatType.OneOrMore,
+                //            Tokens = new List<IGrammarToken>()
+                //            {
+                //                new SubGrammarToken()
+                //                {
+                //                    Tokens = new List<IGrammarToken>()
+                //                    {
+                //                        new ExpressionGrammarToken() { ExpressionName = "EXPRESSION" },
+                //                        //new LiteralGrammarToken() { Text = "\n" }
+                //                    }
+                //                }
+                //            }
+                //        }
+                //    }
+                //},
+
+                new GrammarExpression()
+                {
+                    Name = "EXPRESSION",
+                    Tokens = new List<IGrammarToken>()
+                    {
+                        new ExpressionGrammarToken() { ExpressionName = "IDENTIFIER" },
+                        new LiteralGrammarToken() { Text = "=" },
+                        new ExpressionGrammarToken() { ExpressionName = "TOKEN_LIST" }
+                    }
+                },
+
+                new RegexExpression()
+                {
+                    Name = "IDENTIFIER",
+                    Expression = "('REGEX:')? [A-Z_]+"
+                },
+
+                new GrammarExpression()
+                {
+                    Name = "TOKEN_LIST",
+                    Tokens = new List<IGrammarToken>()
+                    {
+                        new GroupGrammarToken()
+                        {
+                            RepeatType = TokenRepeatType.OneOrMore,
+                            Tokens = new List<IGrammarToken>()
+                            {
+                                new ExpressionGrammarToken() { ExpressionName = "TOKEN" }
+                            }
+                        }
+                    }
+                },
+
+                new GrammarExpression()
+                {
+                    Name = "TOKEN",
+                    Tokens = new List<IGrammarToken>()
+                    {
+                        new GroupGrammarToken()
+                        {
+                            RepeatType = TokenRepeatType.Single,
+                            Tokens = new List<IGrammarToken>()
+                            {
+                                new ExpressionGrammarToken() { ExpressionName = "EXPR_NAME" },
+                                new ExpressionGrammarToken() { ExpressionName = "LITERAL_TOKEN" },
+                                new ExpressionGrammarToken() { ExpressionName = "GROUP_TOKEN" }
+                            }
+                        }
+                    }
+                },
+
+                new RegexExpression()
+                {
+                    Name = "EXPR_NAME",
+                    Expression = "[A-Z_]+"
+                },
+
+                new RegexExpression()
+                {
+                    Name = "LITERAL_TOKEN",
+                    Expression = "'..*'"
+                },
+
+                new GrammarExpression()
+                {
+                    Name = "GROUP_TOKEN",
+                    Tokens = new List<IGrammarToken>()
+                    {
+                        new LiteralGrammarToken() { Text = "(" },
+                        new ExpressionGrammarToken() { ExpressionName = "TOKEN_LIST" }, 
+                        new GroupGrammarToken()
+                        {
+                            RepeatType = TokenRepeatType.ZeroOrMore,
+                            Tokens = new List<IGrammarToken>()
+                            {
+                                new TokenListGrammarToken()
+                                {
+                                    Tokens = new List<IGrammarToken>()
+                                    {
+                                        new LiteralGrammarToken() { Text = "|" },
+                                        new ExpressionGrammarToken() { ExpressionName = "TOKEN_LIST" }, 
+                                    }
+                                }
+                            }
+                        },
+                        new LiteralGrammarToken() { Text = ")" },
+                        new GroupGrammarToken()
+                        {
+                            RepeatType = TokenRepeatType.Optional,
+                            Tokens = new List<IGrammarToken>()
+                            {
+                                new LiteralGrammarToken() { Text = "*" },
+                                new LiteralGrammarToken() { Text = "+" },
+                                new LiteralGrammarToken() { Text = "?" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            return expressions;
+        }
+
+        private LanguageParser _parser;
+        private GrammarParserLanguageInterpreter _interpreter;
+
+        public GrammarParser()
+        {
+            var generator = new ParserGenerator(GetGrammarParserGrammarExpressions());
+
+            _parser = generator.GetParser(new GrammarParserTokenCreator());
+            _interpreter = new GrammarParserLanguageInterpreter();
+        }
+
+        public void Test(string input)
+        {
+            var tokens = _parser.Parse(input);
+
+            GrammarExpression expression = _interpreter.InterpretGrammarParserLanguageTokens(tokens);
+        }
 
         public GrammarExpression ParseSyntaxExpression(string input)
         {
@@ -109,11 +273,11 @@ namespace ParserGen.Generator.GrammarParsing
                 {
                     success = true;
                 }
-                else if (OptionalSyntaxToken(tokens))
-                {
-                    success = true;
-                }
-                else if (MultipleOptionSyntaxToken(tokens))
+                //else if (OptionalSyntaxToken(tokens))
+                //{
+                //    success = true;
+                //}
+                else if (GroupSyntaxToken(tokens))
                 {
                     success = true;
                 }
@@ -149,28 +313,28 @@ namespace ParserGen.Generator.GrammarParsing
             return false;
         }
 
-        private bool OptionalSyntaxToken(List<IGrammarToken> tokens)
-        {
-            if (IsMatch("["))
-            {
-                var optionalTokens = new List<IGrammarToken>();
+        //private bool OptionalSyntaxToken(List<IGrammarToken> tokens)
+        //{
+        //    if (IsMatch("["))
+        //    {
+        //        var optionalTokens = new List<IGrammarToken>();
 
-                if (SyntaxExpression(optionalTokens))
-                {
-                    if (!IsMatch("]"))
-                    {
-                        throw new Exception("Missing ]");
-                    }
+        //        if (SyntaxExpression(optionalTokens))
+        //        {
+        //            if (!IsMatch("]"))
+        //            {
+        //                throw new Exception("Missing ]");
+        //            }
 
-                    tokens.Add(new SubGrammarToken() { Tokens = optionalTokens, IsOptional = true });
-                    return true;
-                }
-            }
+        //            tokens.Add(new TokenListToken() { Tokens = optionalTokens, IsOptional = true });
+        //            return true;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        private bool MultipleOptionSyntaxToken(List<IGrammarToken> tokens)
+        private bool GroupSyntaxToken(List<IGrammarToken> tokens)
         {
             if (IsMatch("("))
             {
@@ -180,7 +344,7 @@ namespace ParserGen.Generator.GrammarParsing
                 {
                     if (subExprTokens.Count > 1)
                     {
-                        optionalTokens.Add(new SubGrammarToken() { Tokens = subExprTokens });
+                        optionalTokens.Add(new TokenListGrammarToken() { Tokens = subExprTokens });
                     }
                     else
                     {
@@ -197,7 +361,7 @@ namespace ParserGen.Generator.GrammarParsing
                             {
                                 if (nextSubExprTokens.Count > 1)
                                 {
-                                    optionalTokens.Add(new SubGrammarToken() { Tokens = nextSubExprTokens });
+                                    optionalTokens.Add(new TokenListGrammarToken() { Tokens = nextSubExprTokens });
                                 }
                                 else
                                 {
@@ -231,7 +395,7 @@ namespace ParserGen.Generator.GrammarParsing
                         repeatType = TokenRepeatType.OneOrMore;
                     }
 
-                    tokens.Add(new MultipleOptionGrammarToken() { Tokens = optionalTokens, RepeatType = repeatType });
+                    tokens.Add(new GroupGrammarToken() { Tokens = optionalTokens, RepeatType = repeatType });
                     return true;
                 }
             }

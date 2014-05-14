@@ -8,14 +8,24 @@ namespace ParserGen.Parser.Tokens
 {
     public class DefaultLanguageTokenCreator : ILanguageTokenCreator
     {
-        public override string RootExpressionName()
+        public virtual string RootExpressionName()
         {
             return "PROGRAM";
         }
 
-        public override ILanguageToken Create(string expressionName, string expressionValue)
+        public virtual ILanguageToken Create(string literalToken)
         {
-            return new ILanguageToken() { Name = expressionName, Value = expressionValue };
+            return new DefaultLanguageToken() { Name = "Iteral Token", Value = literalToken };
+        }
+
+        public virtual ILanguageToken Create(string expressionName, string expressionValue)
+        {
+            return new DefaultLanguageToken() { Name = expressionName, Value = expressionValue };
+        }
+
+        public virtual ILanguageToken Create(string expressionName, List<ILanguageToken> tokens)
+        {
+            return new DefaultLanguageSubToken() { Name = expressionName, Tokens = tokens };
         }
     }
 }

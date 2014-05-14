@@ -19,5 +19,13 @@ namespace Tests.GeneratorTests
 
             generator.AddExpression("SOMETHING");
         }
+
+        [TestMethod]
+        public void Test()
+        {
+            ParserGen.Generator.GrammarParsing.GrammarParser parser = new ParserGen.Generator.GrammarParsing.GrammarParser();
+
+            parser.Test("EXPRESSION = X '=' (A|B)");
+        }
     }
 }

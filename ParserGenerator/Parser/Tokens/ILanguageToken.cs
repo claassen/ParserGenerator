@@ -6,18 +6,11 @@ using System.Threading.Tasks;
 
 namespace ParserGen.Parser
 {
-    public class ILanguageToken
+    public abstract class ILanguageToken
     {
-        public string Name;
-        public string Value;
-
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 
-    public class ILanguageSubToken : ILanguageToken
+    public abstract class ILanguageSubToken : ILanguageToken
     {
         public List<ILanguageToken> Tokens;
     }

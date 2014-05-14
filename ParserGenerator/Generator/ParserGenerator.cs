@@ -19,6 +19,14 @@ namespace ParserGen.Generator
             _parser = new GrammarParser();
         }
 
+        public ParserGenerator(List<GrammarExpression> grammar)
+        {
+            foreach (var expression in grammar)
+            {
+                _expressionTable.Add(expression.Name, expression);
+            }
+        }
+
         public void AddExpression(string syntaxExpression)
         {
             GrammarExpression expression = _parser.ParseSyntaxExpression(syntaxExpression);

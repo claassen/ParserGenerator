@@ -10,11 +10,10 @@ namespace ParserGen.Generator.GrammarParsing
     {
     }
 
-    public class SubGrammarToken : IGrammarToken
+    public class TokenListGrammarToken : IGrammarToken
     {
         public List<IGrammarToken> Tokens;
-        public bool IsOptional;
-
+        
         public override string ToString()
         {
             return string.Join(" ", Tokens.Select(t => t.ToString()));
@@ -41,7 +40,7 @@ namespace ParserGen.Generator.GrammarParsing
         }
     }
 
-    public class MultipleOptionGrammarToken : IGrammarToken
+    public class GroupGrammarToken : IGrammarToken
     {
         public List<IGrammarToken> Tokens;
         public TokenRepeatType RepeatType = TokenRepeatType.Single;
@@ -58,6 +57,10 @@ namespace ParserGen.Generator.GrammarParsing
             {
                 description += "*";
             }
+            else if (RepeatType == TokenRepeatType.Optional)
+            {
+                description += "?";
+            }
 
             return description;
         }
@@ -66,6 +69,7 @@ namespace ParserGen.Generator.GrammarParsing
     public enum TokenRepeatType
     {
         Single,
+        Optional,
         ZeroOrMore,
         OneOrMore
     }
