@@ -45,9 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\GrammarParsing\GrammarExpression.cs" />
-    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\GrammarParserLanguageInterpreter.cs" />
-    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GrammarParserLanguageTokens.cs" />
-    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GrammarParserTokenCreator.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\GPLInterpreter.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GPLTokens.cs" />
+    <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GPLTokenCreator.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarTokens.cs" />
     <Compile Include="Parser\Tokens\DefaultLanguageTokenCreator.cs" />
     <Compile Include="Parser\Tokens\DefaultLanguageToken.cs" />

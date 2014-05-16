@@ -42,7 +42,7 @@ namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage
                     throw new Exception("Error. Expecting TOKEN_LIST");
                 }
 
-                TokenList(((GPLTokenListToken)expressionToken.Tokens[2]).Tokens, _grammarExpr.Tokens);
+                TokenList(((GPLTokenListToken)expressionToken.Tokens[2]).Tokens, grammarExpression.Tokens);
             }
             else if (expressionToken.Tokens[0] is GPLRegexIdentififerToken)
             {
