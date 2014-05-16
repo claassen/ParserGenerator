@@ -40,7 +40,6 @@ namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens
             }
 
             return null;
-            //return base.Create(expressionName, expressionValue);
         }
 
         public ILanguageToken Create(string expressionName, List<ILanguageToken> tokens)
@@ -58,7 +57,6 @@ namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens
             }
 
             return null;
-            //return base.Create(expressionName, tokens);
         }
     }
 }

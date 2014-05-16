@@ -15,15 +15,14 @@ namespace ParserGen.Generator.GrammarParsing
         //Documentation only
         private readonly string[] GPLExpressions = new string[]
         {
-            //@"GRAMMAR = (EXPRESSION)+",
-            @"EXPRESSION = (IDENTIFIER '=' TOKEN_LIST|REGEXIDENTIFIER '=' REGEX_EXPRESSION)",
+            @"EXPRESSION = (IDENTIFIER '=' TOKEN_LIST|REGEX_IDENTIFIER '=' REGEX_EXPRESSION)",
             @"REGEX:IDENTIFIER = [A-Z_]+",
-            @"REGEX:REGEXIDENTIFIER = REGEX:[A-Z_]+",
             @"TOKEN_LIST = (TOKEN)+",
-            @"TOKEN = (EXPR_NAME|LITERAL_TOKEN|GROUP_TOKEN)",
-            @"REGEX:EXPR_NAME = [A-Z_]+",
-            @"REGEX:LITERAL_TOKEN = '..*'",
+            @"REGEX:REGEX_IDENTIFIER = 'REGEX:[A-Z_]+'",
             @"REGEX:REGEX_EXPRESSION = '.+'",
+            @"TOKEN = (EXPR_NAME|LITERAL_TOKEN|GROUP_TOKEN)",
+            @"REGEX:EXPR_NAME = '[A-Z_]+'",
+            @"REGEX:LITERAL_TOKEN = '..*'",
             @"GROUP_TOKEN = '(' TOKEN_LIST ('|' TOKEN_LIST)* ')'"
         };
 
@@ -201,14 +200,15 @@ namespace ParserGen.Generator.GrammarParsing
             var generator = new ParserGenerator(GetGPLGrammarExpressions());
 
             _parser = generator.GetParser(new GPLTokenCreator());
+
             _interpreter = new GPLInterpreter();
         }
 
         public GrammarExpression ParseGrammarExpression(string input)
         {
-            var tokens_ = _parser.Parse(input);
+            var tokens = _parser.Parse(input);
 
-            return _interpreter.InterpretGPLTokens(tokens_);
+            return _interpreter.InterpretGPLTokens(tokens);
         }
     }
 }
