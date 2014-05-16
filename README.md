@@ -27,3 +27,18 @@ Example parser input for the above grammar:
 <pre>
 (+ 1 (lambda (x,y) (+ x y) 1 (* 2 2)))
 </pre>
+
+Example usage:
+
+<pre>
+ParserGenerator generator = new ParserGenerator();
+
+foreach (string expression in expressions)
+{
+    generator.AddExpression(expression);
+}
+
+LanguageParser parser = generator.GetParser();
+
+List<ILanguageToken> tokens = parser.Parse("(+ 1 (lambda (x,y) (+ x y) 1 (* 2 2)))");
+</pre>
