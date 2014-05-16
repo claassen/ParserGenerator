@@ -24,4 +24,6 @@ LOGICAL_OP         = ('<'|'>'|'<='|'>=')
 
 Example parser input for the above grammar:
 
+<pre>
 (+ 1 (lambda (x,y) (+ x y) 1 (* 2 2)))
+</pre>
