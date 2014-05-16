@@ -19,7 +19,7 @@ ARGS_LIST          = '(' VARIABLE (',' VARIABLE)* ')'
 REGEX:VARIABLE     = '[a-zA-Z]+'
 REGEX:NUMBER       = '[0-9]+'
 MATH_OP            = ('+'|'-'|'*'|'/')
-LOGICAL_OP         = ('<'|'>'|'<='|'>=')
+LOGICAL_OP         = ('&lt;'|'&gt;'|'&lt;='|'&gt;=')
 </pre>
 
 Example parser input for the above grammar:
