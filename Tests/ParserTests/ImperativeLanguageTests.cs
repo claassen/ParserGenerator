@@ -17,8 +17,8 @@ namespace Tests.ParserTests
             @"PROGRAM      = 'BEGIN' (ASSIGNMENT)+ 'END'",
             @"ASSIGNMENT       = VARIABLE '=' VALUE ';'",
             @"VALUE              = (NUMBER|VARIABLE)",
-            @"REGEX:VARIABLE     = [a-zA-Z]+",
-            @"REGEX:NUMBER       = [0-9]+"
+            @"REGEX:VARIABLE     = '[a-zA-Z]+'",
+            @"REGEX:NUMBER       = '[0-9]+'"
         };
 
         private LanguageParser CreateParser()

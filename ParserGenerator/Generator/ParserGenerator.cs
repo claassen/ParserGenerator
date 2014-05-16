@@ -29,7 +29,7 @@ namespace ParserGen.Generator
 
         public void AddExpression(string syntaxExpression)
         {
-            GrammarExpression expression = _parser.ParseSyntaxExpression(syntaxExpression);
+            GrammarExpression expression = _parser.ParseGrammarExpression(syntaxExpression);
 
             _expressionTable.Add(expression.Name, expression);
         }

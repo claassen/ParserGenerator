@@ -19,16 +19,18 @@ namespace ParserGen.Generator.GrammarParsing
         private readonly string[] Expressions2 = new string[]
         {
             //@"GRAMMAR = (EXPRESSION)+",
-            @"EXPRESSION = IDENTIFIER '=' TOKEN_LIST",
-            @"REGEX:IDENTIFIER = (REGEX:)?[A-Z_]+",
+            @"EXPRESSION = (IDENTIFIER '=' TOKEN_LIST|REGEXIDENTIFIER '=' REGEX_EXPRESSION)",
+            @"REGEX:IDENTIFIER = [A-Z_]+",
+            @"REGEX:REGEXIDENTIFIER = REGEX:[A-Z_]+",
             @"TOKEN_LIST = (TOKEN)+",
             @"TOKEN = (EXPR_NAME|LITERAL_TOKEN|GROUP_TOKEN)",
             @"REGEX:EXPR_NAME = [A-Z_]+",
             @"REGEX:LITERAL_TOKEN = '..*'",
-            @"GROUP_TOKEN = '(' TOKEN_LIST ('|' TOKEN_LIST)* ')' "
+            @"REGEX:REGEX_EXPRESSION = '.+'",
+            @"GROUP_TOKEN = '(' TOKEN_LIST ('|' TOKEN_LIST)* ')'"
         };
 
-        private List<GrammarExpression> GetGrammarParserGrammarExpressions()
+        private List<GrammarExpression> GetGPLGrammarExpressions()
         {
             var expressions = new List<GrammarExpression>()
             {
@@ -60,16 +62,52 @@ namespace ParserGen.Generator.GrammarParsing
                     Name = "EXPRESSION",
                     Tokens = new List<IGrammarToken>()
                     {
-                        new ExpressionGrammarToken() { ExpressionName = "IDENTIFIER" },
-                        new LiteralGrammarToken() { Text = "=" },
-                        new ExpressionGrammarToken() { ExpressionName = "TOKEN_LIST" }
+                        new GroupGrammarToken()
+                        {
+                            RepeatType = TokenRepeatType.Single,
+                            Tokens = new List<IGrammarToken>()
+                            {
+                                new TokenListGrammarToken()
+                                {
+                                    Tokens = new List<IGrammarToken>()
+                                    {
+                                        new ExpressionGrammarToken() { ExpressionName = "IDENTIFIER" },
+                                        new LiteralGrammarToken() { Text = "=" },
+                                        new ExpressionGrammarToken() { ExpressionName = "TOKEN_LIST" }
+                                    }
+                                },
+                                new TokenListGrammarToken()
+                                {
+                                    Tokens = new List<IGrammarToken>()
+                                    {
+                                        new ExpressionGrammarToken() { ExpressionName = "REGEX_IDENTIFIER" },
+                                        new LiteralGrammarToken() { Text = "=" },
+                                        new ExpressionGrammarToken() { ExpressionName = "REGEX_EXPRESSION" }
+                                    }
+                                }
+                            }
+                        }
+
+                        
                     }
                 },
 
                 new RegexExpression()
                 {
                     Name = "IDENTIFIER",
-                    Expression = "('REGEX:')? [A-Z_]+"
+                    Expression = @"^[A-Z_]+$"
+                },
+
+                new RegexExpression()
+                {
+                    Name = "REGEX_IDENTIFIER",
+                    Expression = @"^REGEX\:[A-Z_]+$"
+                },
+
+                new RegexExpression()
+                {
+                    Name = "REGEX_EXPRESSION",
+                    Expression = @"^.+$"
                 },
 
                 new GrammarExpression()
@@ -109,13 +147,13 @@ namespace ParserGen.Generator.GrammarParsing
                 new RegexExpression()
                 {
                     Name = "EXPR_NAME",
-                    Expression = "[A-Z_]+"
+                    Expression = "^[A-Z_]+$"
                 },
 
                 new RegexExpression()
                 {
                     Name = "LITERAL_TOKEN",
-                    Expression = "'..*'"
+                    Expression = "^'..*'$"
                 },
 
                 new GrammarExpression()
@@ -159,247 +197,229 @@ namespace ParserGen.Generator.GrammarParsing
         }
 
         private LanguageParser _parser;
-        private GrammarParserLanguageInterpreter _interpreter;
+        private GPLInterpreter _interpreter;
 
         public GrammarParser()
         {
-            var generator = new ParserGenerator(GetGrammarParserGrammarExpressions());
+            var generator = new ParserGenerator(GetGPLGrammarExpressions());
 
-            _parser = generator.GetParser(new GrammarParserTokenCreator());
-            _interpreter = new GrammarParserLanguageInterpreter();
+            _parser = generator.GetParser(new GPLTokenCreator());
+            _interpreter = new GPLInterpreter();
         }
 
-        public void Test(string input)
+        public GrammarExpression ParseGrammarExpression(string input)
         {
-            var tokens = _parser.Parse(input);
+            var tokens_ = _parser.Parse(input);
 
-            GrammarExpression expression = _interpreter.InterpretGrammarParserLanguageTokens(tokens);
-        }
+            GrammarExpression expression = _interpreter.InterpretGPLTokens(tokens_);
 
-        public GrammarExpression ParseSyntaxExpression(string input)
-        {
-            _input = input;
-            _currentToken = null;
+            return expression;
 
-            var tokens = new List<IGrammarToken>();
+            #region OLD
 
-            //Scan expession name
-            Scan();
+            //_input = input;
+            //_currentToken = null;
+
+            //var tokens = new List<IGrammarToken>();
+
+            ////Scan expession name
+            //Scan();
             
-            string expressionName = _currentToken;
-            bool isRegexExpression = false;
+            //string expressionName = _currentToken;
+            //bool isRegexExpression = false;
 
-            if (expressionName.StartsWith("REGEX:"))
-            {
-                isRegexExpression = true;
-                expressionName = expressionName.Substring(6);
+            //if (expressionName.StartsWith("REGEX:"))
+            //{
+            //    isRegexExpression = true;
+            //    expressionName = expressionName.Substring(6);
 
-                if (!_currentToken.StartsWith("^"))
-                {
-                    _currentToken = "^" + _currentToken;
-                }
+            //    if (!_currentToken.StartsWith("^"))
+            //    {
+            //        _currentToken = "^" + _currentToken;
+            //    }
 
-                if (!_currentToken.EndsWith("$"))
-                {
-                    _currentToken = _currentToken + "$";
-                }
-            }
+            //    if (!_currentToken.EndsWith("$"))
+            //    {
+            //        _currentToken = _currentToken + "$";
+            //    }
+            //}
 
-            //Scan =
-            Scan();
+            ////Scan =
+            //Scan();
 
-            if (_currentToken != "=")
-            {
-                throw new Exception("Invalid expression declaration string");
-            }
+            //if (_currentToken != "=")
+            //{
+            //    throw new Exception("Invalid expression declaration string");
+            //}
 
-            //Scan first token
-            Scan();
+            ////Scan first token
+            //Scan();
 
-            //If the expression is a regex expression (indicated by the name starting with REGEX:),
-            //then we just take the literal string value of the expression as its
-            if (isRegexExpression)
-            {
-                return new RegexExpression() { Name = expressionName, Expression = _currentToken + _input };
-            }
+            ////If the expression is a regex expression (indicated by the name starting with REGEX:),
+            ////then we just take the literal string value of the expression as its
+            //if (isRegexExpression)
+            //{
+            //    return new RegexExpression() { Name = expressionName, Expression = _currentToken + _input };
+            //}
 
-            var e = new GrammarExpression() { Name = expressionName };
+            //var e = new GrammarExpression() { Name = expressionName };
 
-            if (SyntaxExpression(tokens))
-            {
-                //success
-                e.Tokens = tokens;
-                return e;
-            }
-            else
-            {
-                return null;
-            }
+            //if (SyntaxExpression(tokens))
+            //{
+            //    //success
+            //    e.Tokens = tokens;
+            //    return e;
+            //}
+            //else
+            //{
+            //    return null;
+            //}
+            #endregion
         }
 
-        private void Scan()
-        {
-            string[] tokens = Regex.Split(_input, @"\s*('[()]'|[()]|[[\]]|[|])\s*|[\s[\]|]");
+        #region OLD
 
-            _currentToken = tokens.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
-
-            if (!string.IsNullOrEmpty(_currentToken))
-            {
-                _input = _input.Substring(_currentToken.Length).TrimStart();
-            }
-        }
-
-        private bool IsMatch(string token)
-        {
-            if (_currentToken == token)
-            {
-                Scan();
-                return true;
-            }
-            return false;
-        }
-
-        private bool SyntaxExpression(List<IGrammarToken> tokens)
-        {
-            while (true)
-            {
-                bool success = false;
-
-                if (ExpressionSyntaxToken(tokens))
-                {
-                    success = true;
-                }
-                else if (LiteralSyntaxToken(tokens))
-                {
-                    success = true;
-                }
-                //else if (OptionalSyntaxToken(tokens))
-                //{
-                //    success = true;
-                //}
-                else if (GroupSyntaxToken(tokens))
-                {
-                    success = true;
-                }
-
-                if (!success)
-                {
-                    break;
-                }
-            }
-
-            return true;
-        }
-
-        private bool ExpressionSyntaxToken(List<IGrammarToken> tokens)
-        {
-            if (_currentToken != null && Regex.IsMatch(_currentToken, @"^[A-Z_]+$"))
-            {
-                tokens.Add(new ExpressionGrammarToken() { ExpressionName = _currentToken });
-                Scan();
-                return true;
-            }
-            return false;
-        }
-
-        private bool LiteralSyntaxToken(List<IGrammarToken> tokens)
-        {
-            if (_currentToken != null && Regex.IsMatch(_currentToken, @"'..*'"))
-            {
-                tokens.Add(new LiteralGrammarToken() { Text = _currentToken.Replace("'", "") });
-                Scan();
-                return true;
-            }
-            return false;
-        }
-
-        //private bool OptionalSyntaxToken(List<IGrammarToken> tokens)
+        //private void Scan()
         //{
-        //    if (IsMatch("["))
+        //    string[] tokens = Regex.Split(_input, @"\s*('[()]'|[()]|[[\]]|[|])\s*|[\s[\]|]");
+
+        //    _currentToken = tokens.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
+
+        //    if (!string.IsNullOrEmpty(_currentToken))
         //    {
-        //        var optionalTokens = new List<IGrammarToken>();
-
-        //        if (SyntaxExpression(optionalTokens))
-        //        {
-        //            if (!IsMatch("]"))
-        //            {
-        //                throw new Exception("Missing ]");
-        //            }
-
-        //            tokens.Add(new TokenListToken() { Tokens = optionalTokens, IsOptional = true });
-        //            return true;
-        //        }
+        //        _input = _input.Substring(_currentToken.Length).TrimStart();
         //    }
+        //}
 
+        //private bool IsMatch(string token)
+        //{
+        //    if (_currentToken == token)
+        //    {
+        //        Scan();
+        //        return true;
+        //    }
         //    return false;
         //}
 
-        private bool GroupSyntaxToken(List<IGrammarToken> tokens)
-        {
-            if (IsMatch("("))
-            {
-                var optionalTokens = new List<IGrammarToken>();
-                var subExprTokens = new List<IGrammarToken>();
-                if (SyntaxExpression(subExprTokens))
-                {
-                    if (subExprTokens.Count > 1)
-                    {
-                        optionalTokens.Add(new TokenListGrammarToken() { Tokens = subExprTokens });
-                    }
-                    else
-                    {
-                        //Avoid unnecessary nesting of SubSyntaxTokens
-                        optionalTokens.Add(subExprTokens[0]);
-                    }
+        //private bool SyntaxExpression(List<IGrammarToken> tokens)
+        //{
+        //    while (true)
+        //    {
+        //        bool success = false;
 
-                    while (true)
-                    {
-                        if (IsMatch("|"))
-                        {
-                            var nextSubExprTokens = new List<IGrammarToken>();
-                            if (SyntaxExpression(nextSubExprTokens))
-                            {
-                                if (nextSubExprTokens.Count > 1)
-                                {
-                                    optionalTokens.Add(new TokenListGrammarToken() { Tokens = nextSubExprTokens });
-                                }
-                                else
-                                {
-                                    //Avoid unnecessary nesting of SubSyntaxTokens
-                                    optionalTokens.Add(nextSubExprTokens[0]);
-                                }
-                            }
-                            else
-                            {
-                                throw new Exception("Missing expression after |");
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (!IsMatch(")"))
-                    {
-                        throw new Exception("Missing )");
-                    }
+        //        if (ExpressionSyntaxToken(tokens))
+        //        {
+        //            success = true;
+        //        }
+        //        else if (LiteralSyntaxToken(tokens))
+        //        {
+        //            success = true;
+        //        }
+        //        else if (GroupSyntaxToken(tokens))
+        //        {
+        //            success = true;
+        //        }
 
-                    TokenRepeatType repeatType = TokenRepeatType.Single;
+        //        if (!success)
+        //        {
+        //            break;
+        //        }
+        //    }
 
-                    if(IsMatch("*"))
-                    {
-                        repeatType = TokenRepeatType.ZeroOrMore;
-                    }
-                    else if(IsMatch("+"))
-                    {
-                        repeatType = TokenRepeatType.OneOrMore;
-                    }
+        //    return true;
+        //}
 
-                    tokens.Add(new GroupGrammarToken() { Tokens = optionalTokens, RepeatType = repeatType });
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool ExpressionSyntaxToken(List<IGrammarToken> tokens)
+        //{
+        //    if (_currentToken != null && Regex.IsMatch(_currentToken, @"^[A-Z_]+$"))
+        //    {
+        //        tokens.Add(new ExpressionGrammarToken() { ExpressionName = _currentToken });
+        //        Scan();
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        //private bool LiteralSyntaxToken(List<IGrammarToken> tokens)
+        //{
+        //    if (_currentToken != null && Regex.IsMatch(_currentToken, @"'..*'"))
+        //    {
+        //        tokens.Add(new LiteralGrammarToken() { Text = _currentToken.Replace("'", "") });
+        //        Scan();
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        //private bool GroupSyntaxToken(List<IGrammarToken> tokens)
+        //{
+        //    if (IsMatch("("))
+        //    {
+        //        var optionalTokens = new List<IGrammarToken>();
+        //        var subExprTokens = new List<IGrammarToken>();
+        //        if (SyntaxExpression(subExprTokens))
+        //        {
+        //            if (subExprTokens.Count > 1)
+        //            {
+        //                optionalTokens.Add(new TokenListGrammarToken() { Tokens = subExprTokens });
+        //            }
+        //            else
+        //            {
+        //                //Avoid unnecessary nesting of SubSyntaxTokens
+        //                optionalTokens.Add(subExprTokens[0]);
+        //            }
+
+        //            while (true)
+        //            {
+        //                if (IsMatch("|"))
+        //                {
+        //                    var nextSubExprTokens = new List<IGrammarToken>();
+        //                    if (SyntaxExpression(nextSubExprTokens))
+        //                    {
+        //                        if (nextSubExprTokens.Count > 1)
+        //                        {
+        //                            optionalTokens.Add(new TokenListGrammarToken() { Tokens = nextSubExprTokens });
+        //                        }
+        //                        else
+        //                        {
+        //                            //Avoid unnecessary nesting of SubSyntaxTokens
+        //                            optionalTokens.Add(nextSubExprTokens[0]);
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        throw new Exception("Missing expression after |");
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    break;
+        //                }
+        //            }
+
+        //            if (!IsMatch(")"))
+        //            {
+        //                throw new Exception("Missing )");
+        //            }
+
+        //            TokenRepeatType repeatType = TokenRepeatType.Single;
+
+        //            if(IsMatch("*"))
+        //            {
+        //                repeatType = TokenRepeatType.ZeroOrMore;
+        //            }
+        //            else if(IsMatch("+"))
+        //            {
+        //                repeatType = TokenRepeatType.OneOrMore;
+        //            }
+
+        //            tokens.Add(new GroupGrammarToken() { Tokens = optionalTokens, RepeatType = repeatType });
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
+
+        #endregion
     }
 }

@@ -21,8 +21,8 @@ namespace Tests
             @"LOGICAL_EXPRESSION = LOGICAL_OP EXPR EXPR EXPR EXPR",
             @"LAMBDA             = '(' 'lambda' ARGS_LIST EXPR (EXPR)+ ')'",
             @"ARGS_LIST          = '(' VARIABLE (',' VARIABLE)* ')'",
-            @"REGEX:VARIABLE     = [a-zA-Z]+",
-            @"REGEX:NUMBER       = [0-9]+",
+            @"REGEX:VARIABLE     = '[a-zA-Z]+'",
+            @"REGEX:NUMBER       = '[0-9]+'",
             @"MATH_OP            = ('+'|'-'|'*'|'/')",
             @"LOGICAL_OP         = ('<'|'>'|'<='|'>=')"
         };

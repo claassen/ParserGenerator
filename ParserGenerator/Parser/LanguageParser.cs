@@ -33,8 +33,8 @@ namespace ParserGen.Parser
 
         private void Scan()
         {
-            string[] tokens = Regex.Split(_input, @"(?=[ \(\)\|\[\];,])|(?<=[ \(\)\|\[\];,])");
-
+            //string[] tokens = Regex.Split(_input, @"(?=[ \(\)\|\[\];,])|(?<=[ \(\)\|\[\];,])");
+            string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|[|]|;|,)\s*|[\s[\]|\(\);,]");
             _currentToken = tokens.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
 
             if (!string.IsNullOrEmpty(_currentToken))
@@ -94,7 +94,6 @@ namespace ParserGen.Parser
                 }
 
                 tokens.Add(_tokenCreator.Create(expression.Name, subTokens));
-                //tokens.Add(new ILanguageSubToken() { Name = expression.Name, Tokens = subTokens });
             }
         }
 
@@ -150,6 +149,7 @@ namespace ParserGen.Parser
             {
                 tokens.Add(_tokenCreator.Create(_currentToken));
             }
+            
             Scan();
         }
 
