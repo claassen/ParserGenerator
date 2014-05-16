@@ -7,6 +7,7 @@ Uses itself to generate a parser for parsing input grammar expressions.
 
 Example input grammar for a Lisp like language:
 
+<pre>
 PROGRAM            = EXPR
 EXPR               = (EXPRESSION | '(' EXPR ')' )
 EXPRESSION         = (VALUE|(MATH_EXPRESSION|LOGICAL_EXPRESSION|LAMBDA))
@@ -19,6 +20,7 @@ REGEX:VARIABLE     = '[a-zA-Z]+'
 REGEX:NUMBER       = '[0-9]+'
 MATH_OP            = ('+'|'-'|'*'|'/')
 LOGICAL_OP         = ('<'|'>'|'<='|'>=')
+</pre>
 
 Example parser input for the above grammar:
 
