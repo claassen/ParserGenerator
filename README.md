@@ -40,5 +40,5 @@ foreach (string expression in expressions)
 
 LanguageParser parser = generator.GetParser();
 
-List&le;ILanguageToken&ge; tokens = parser.Parse("(+ 1 (lambda (x,y) (+ x y) 1 (* 2 2)))");
+List&lt;ILanguageToken&gt; tokens = parser.Parse("(+ 1 (lambda (x,y) (+ x y) 1 (* 2 2)))");
 </pre>
