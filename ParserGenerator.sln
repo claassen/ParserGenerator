@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserGen", "ParserGenerato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesterCLI", "TesterCLI\TesterCLI.csproj", "{60D8A529-02AD-4400-B89F-0C10324EFD44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05269DAF-D3BF-4CC3-B4E0-F66B8EB3D6AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60D8A529-02AD-4400-B89F-0C10324EFD44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60D8A529-02AD-4400-B89F-0C10324EFD44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60D8A529-02AD-4400-B89F-0C10324EFD44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60D8A529-02AD-4400-B89F-0C10324EFD44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

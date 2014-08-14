@@ -3,35 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
 
-namespace Tests.ParserTests
+namespace TesterCLI
 {
-    [TestClass]
-    public class LL_k_Tests
+    class Program
     {
-        [TestMethod]
-        public void LL_k_GrammarTest()
-        {
-            var generator = new ParserGenerator();
-
-            generator.AddExpression("PROGRAM = EXPRESSION");
-            generator.AddExpression("EXPRESSION = (X|Y)");
-            generator.AddExpression("X = A B");
-            generator.AddExpression("Y = A C");
-            generator.AddExpression("A = 'a'");
-            generator.AddExpression("B = 'b'");
-            generator.AddExpression("C = 'c'");
-
-            var parser = generator.GetParser();
-
-            var tokens = parser.Parse("a b");
-            var tokens2 = parser.Parse("a c");
-        }
-
-        [TestMethod]
-        public void C_like_Test()
+        static void Main(string[] args)
         {
             var generator = new ParserGenerator();
 
@@ -49,7 +27,7 @@ namespace Tests.ParserTests
             generator.AddExpression("ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*");
             generator.AddExpression("MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*");
             generator.AddExpression("PRIMARY = ('(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY)");
-
+            
             generator.AddExpression("REGEX:NUMBER = '[0-9]+'");
             generator.AddExpression("REGEX:VARIABLE = '[a-zA-Z]+'");
 

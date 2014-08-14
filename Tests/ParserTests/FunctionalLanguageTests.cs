@@ -15,7 +15,7 @@ namespace Tests
         {
             @"PROGRAM            = EXPR", 
             @"EXPR               = (EXPRESSION | '(' EXPR ')' )",
-            @"EXPRESSION         = (VALUE| (MATH_EXPRESSION|LOGICAL_EXPRESSION|LAMBDA) )",
+            @"EXPRESSION         = (VALUE | (MATH_EXPRESSION|LOGICAL_EXPRESSION|LAMBDA) )",
             @"VALUE              = (NUMBER|VARIABLE)",
             @"MATH_EXPRESSION    = MATH_OP EXPR EXPR",
             @"LOGICAL_EXPRESSION = LOGICAL_OP EXPR EXPR EXPR EXPR",

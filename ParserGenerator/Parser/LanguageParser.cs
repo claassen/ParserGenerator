@@ -175,6 +175,8 @@ namespace ParserGen.Parser
                             tokens.AddRange(matchTokens);
                             success = true;
                             globalSuccess = true;
+                            SAVED_INPUT = _input;
+                            SAVED_TOKEN = _currentToken;
                             break;
                         }
                         catch
