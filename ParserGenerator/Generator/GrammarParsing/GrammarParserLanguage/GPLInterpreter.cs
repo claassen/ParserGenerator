@@ -127,7 +127,15 @@ namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage
 
             TokenList(((GPLTokenListToken)tokenList).Tokens, subGroupTokens);
 
-            groupTokens.Add(new TokenListGrammarToken() { Tokens = subGroupTokens });
+            //Compact TokenLists with only 1 element
+            if (subGroupTokens.Count > 1)
+            {
+                groupTokens.Add(new TokenListGrammarToken() { Tokens = subGroupTokens });
+            }
+            else
+            {
+                groupTokens.Add(subGroupTokens.First());
+            }
 
             while (true)
             {
@@ -167,7 +175,15 @@ namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage
 
                 TokenList(((GPLTokenListToken)tokenList).Tokens, subGroupTokens);
 
-                groupTokens.Add(new TokenListGrammarToken() { Tokens = subGroupTokens });
+                //Compact TokenList with only 1 token
+                if (subGroupTokens.Count > 1)
+                {
+                    groupTokens.Add(new TokenListGrammarToken() { Tokens = subGroupTokens });
+                }
+                else
+                {
+                    groupTokens.Add(subGroupTokens.First());
+                }
             }
 
             TokenRepeatType repeatType = TokenRepeatType.Single;

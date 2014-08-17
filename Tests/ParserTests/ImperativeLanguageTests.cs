@@ -23,12 +23,7 @@ namespace Tests.ParserTests
 
         private LanguageParser CreateParser()
         {
-            ParserGenerator generator = new ParserGenerator();
-
-            foreach (string expression in expressions)
-            {
-                generator.AddExpression(expression);
-            }
+            var generator = new ParserGenerator(expressions.ToList());
 
             return generator.GetParser();
         }

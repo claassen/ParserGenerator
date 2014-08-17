@@ -6,12 +6,25 @@ using System.Threading.Tasks;
 
 namespace ParserGen.Parser
 {
-    public abstract class ILanguageToken
+    public interface ILanguageToken
     {
     }
 
-    public abstract class ILanguageSubToken : ILanguageToken
+    
+
+    public abstract class IUserLanguageToken : ILanguageToken
     {
-        public List<ILanguageToken> Tokens;
+    }
+
+    public abstract class IUserLanguageTerminalToken : IUserLanguageToken
+    {
+        public abstract IUserLanguageToken Create(string expressionValue);
+    }
+
+    public abstract class IUserLanguageNonTerminalToken : IUserLanguageToken
+    {
+        public List<ILanguageToken> Tokens { get; set; }
+
+        public abstract IUserLanguageToken Create(string expressionValue, List<ILanguageToken> tokens);
     }
 }

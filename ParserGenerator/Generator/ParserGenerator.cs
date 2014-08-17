@@ -12,12 +12,8 @@ namespace ParserGen.Generator
     public class ParserGenerator
     {
         private Dictionary<string, GrammarExpression> _expressionTable = new Dictionary<string, GrammarExpression>();
+        private Dictionary<string, IUserLanguageToken> _userTokens;
         private GrammarParser _parser;
-
-        public ParserGenerator()
-        {
-            _parser = new GrammarParser();
-        }
 
         public ParserGenerator(List<GrammarExpression> grammar)
         {
@@ -27,27 +23,65 @@ namespace ParserGen.Generator
             }
         }
 
-        public void AddExpression(string syntaxExpression)
+        public ParserGenerator(List<string> expressions)
+        {
+            Init();
+
+            expressions.ForEach(e => AddExpression(e));
+        }
+
+        public ParserGenerator(List<IUserLanguageToken> expressions)
+        {
+            Init();
+
+            _userTokens = new Dictionary<string, IUserLanguageToken>();
+
+            expressions.ForEach(e => AddExpression(e));
+        }
+
+        private void Init()
+        {
+            _parser = new GrammarParser();
+        }
+
+        private void AddExpression(string syntaxExpression)
         {
             GrammarExpression expression = _parser.ParseGrammarExpression(syntaxExpression);
-
-            if (expression.Tokens != null &&
-                expression.Tokens.Count > 0 &&
-                expression.Tokens.First() is ExpressionGrammarToken &&
-                ((ExpressionGrammarToken)expression.Tokens.First()).ExpressionName == expression.Name)
-            {
-                throw new Exception("Left recursion detected");
-            }
 
             _expressionTable.Add(expression.Name, expression);
         }
 
-        public LanguageParser GetParser()
+        private void AddExpression(IUserLanguageToken t)
         {
-            return GetParser(new DefaultLanguageTokenCreator());
+            var tokenAttr = t.GetType().GetCustomAttributes(typeof(UserLanguageToken), false).FirstOrDefault() as UserLanguageToken;
+            
+            if (tokenAttr == null)
+            {
+                throw new Exception("Missing [UserLanguageToken] class attribute.");
+            }
+
+            string name = tokenAttr.Name;
+            string pattern = tokenAttr.Pattern;
+
+            GrammarExpression expression = _parser.ParseGrammarExpression(name + " = " + pattern);
+
+            _expressionTable.Add(expression.Name, expression);
+            _userTokens.Add(expression.Name, t);
         }
 
-        public LanguageParser GetParser(ILanguageTokenCreator tokenCreator)
+        public LanguageParser GetParser(List<string> ignoreLiterals = null)
+        {
+            return GetParser(new DefaultLanguageTokenCreator(_userTokens), ignoreLiterals);
+        }
+
+        public LanguageParser GetParser(ILanguageTokenCreator tokenCreator, List<string> ignoreLiterals = null)
+        {
+            ValidateGrammar();
+
+            return new LanguageParser(_expressionTable, tokenCreator, ignoreLiterals);
+        }
+
+        private void ValidateGrammar()
         {
             for (int i = 0; i < _expressionTable.Count; i++)
             {
@@ -56,7 +90,7 @@ namespace ParserGen.Generator
                 if (exp1.Value.Tokens != null)
                 {
                     var firstToken1 = exp1.Value.Tokens.First();
-                    
+
                     while (firstToken1 is GroupGrammarToken || firstToken1 is TokenListGrammarToken)
                     {
                         if (firstToken1 is GroupGrammarToken)
@@ -103,8 +137,6 @@ namespace ParserGen.Generator
                     }
                 }
             }
-
-            return new LanguageParser(_expressionTable, tokenCreator);
         }
     }
 }

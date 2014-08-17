@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ParserGen</RootNamespace>
-    <AssemblyName>Test</AssemblyName>
+    <AssemblyName>ParserGen</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -55,6 +55,7 @@
     <Compile Include="Parser\Tokens\ILanguageTokenCreator.cs" />
     <Compile Include="Parser\LanguageParser.cs" />
     <Compile Include="Generator\ParserGenerator.cs" />
+    <Compile Include="Parser\Tokens\TokenAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarParser.cs" />
   </ItemGroup>

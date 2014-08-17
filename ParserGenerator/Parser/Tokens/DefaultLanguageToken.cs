@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace ParserGen.Parser.Tokens
 {
-    public class DefaultLanguageToken : ILanguageToken
+    public abstract class DefaultLanguageToken : ILanguageToken
     {
         public string Name;
-        public string Value;
 
         public override string ToString()
         {
@@ -17,8 +16,13 @@ namespace ParserGen.Parser.Tokens
         }
     }
 
-    public class DefaultLanguageSubToken : ILanguageSubToken
+    public class DefaultLanguageTerminalToken : DefaultLanguageToken
     {
-        public string Name;
+        public string Value;
+    }
+
+    public class DefaultLanguageNonTerminalToken : DefaultLanguageToken
+    {
+        public List<ILanguageToken> Tokens { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
 using ParserGen.Generator.GrammarParsing;
@@ -29,12 +30,7 @@ namespace Tests
 
         private LanguageParser CreateParser()
         {
-            ParserGenerator generator = new ParserGenerator();
-
-            foreach (string expression in expressions)
-            {
-                generator.AddExpression(expression);
-            }
+            var generator = new ParserGenerator(expressions.ToList());
 
             return generator.GetParser();
         }
@@ -81,49 +77,19 @@ namespace Tests
 
             var tokens = parser.Parse("+ 1 2");
 
-            var program = (DefaultLanguageSubToken)tokens[0];
-            Assert.AreEqual("PROGRAM", program.Name);
-
-            var expr = (DefaultLanguageSubToken)program.Tokens[0];
-            Assert.AreEqual("EXPR", expr.Name);
-
-            var expression = (DefaultLanguageSubToken)expr.Tokens[0];
-            Assert.AreEqual("EXPRESSION", expression.Name);
-
-            var mathExpression = (DefaultLanguageSubToken)expression.Tokens[0];
+            var mathExpression = (DefaultLanguageNonTerminalToken)tokens[0];
             Assert.AreEqual("MATH_EXPRESSION", mathExpression.Name);
 
-            var mathOp = (DefaultLanguageSubToken)mathExpression.Tokens[0];
-            Assert.AreEqual("MATH_OP", mathOp.Name);
-
-            var mathOpToken = (DefaultLanguageToken)mathOp.Tokens[0];
+            var mathOpToken = (DefaultLanguageTerminalToken)mathExpression.Tokens[0];
             Assert.AreEqual("+", mathOpToken.Value);
 
-            var operand1 = (DefaultLanguageSubToken)mathExpression.Tokens[1];
-            Assert.AreEqual("EXPR", operand1.Name);
+            var operand1 = (DefaultLanguageTerminalToken)mathExpression.Tokens[1];
+            Assert.AreEqual("NUMBER", operand1.Name);
+            Assert.AreEqual("1", operand1.Value);
 
-            var operand1Expression = (DefaultLanguageSubToken)operand1.Tokens[0];
-            Assert.AreEqual("EXPRESSION", operand1Expression.Name);
-
-            var operand1Value = (DefaultLanguageSubToken)operand1Expression.Tokens[0];
-            Assert.AreEqual("VALUE", operand1Value.Name);
-
-            var operand1ValueNumber = (DefaultLanguageToken)operand1Value.Tokens[0];
-            Assert.AreEqual("NUMBER", operand1ValueNumber.Name);
-            Assert.AreEqual("1", operand1ValueNumber.Value);
-
-            var operand2 = (DefaultLanguageSubToken)mathExpression.Tokens[2];
-            Assert.AreEqual("EXPR", operand1.Name);
-
-            var operand2Expression = (DefaultLanguageSubToken)operand2.Tokens[0];
-            Assert.AreEqual("EXPRESSION", operand2Expression.Name);
-
-            var operand2Value = (DefaultLanguageSubToken)operand2Expression.Tokens[0];
-            Assert.AreEqual("VALUE", operand2Value.Name);
-
-            var operand2ValueNumber = (DefaultLanguageToken)operand2Value.Tokens[0];
-            Assert.AreEqual("NUMBER", operand2ValueNumber.Name);
-            Assert.AreEqual("2", operand2ValueNumber.Value);
+            var operand2 = (DefaultLanguageTerminalToken)mathExpression.Tokens[2];
+            Assert.AreEqual("NUMBER", operand2.Name);
+            Assert.AreEqual("2", operand2.Value);
         }
 
         [TestMethod]

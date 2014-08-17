@@ -199,7 +199,9 @@ namespace ParserGen.Generator.GrammarParsing
         {
             var generator = new ParserGenerator(GetGPLGrammarExpressions());
 
-            _parser = generator.GetParser(new GPLTokenCreator());
+            var ignoreTokens = new List<string>() { };
+
+            _parser = generator.GetParser(new GPLTokenCreator(), ignoreTokens);
 
             _interpreter = new GPLInterpreter();
         }

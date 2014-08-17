@@ -15,49 +15,54 @@ namespace Tests.GeneratorTests
         [ExpectedException(typeof(Exception))]
         public void ParserGeneratorTest_InvalidExpression_Fail()
         {
-            ParserGenerator generator = new ParserGenerator();
-
-            generator.AddExpression("SOMETHING");
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "SOMETHING"
+            });
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
         public void ParserGeneratorTest_LeftRecursion_Fail()
         {
-            ParserGenerator generator = new ParserGenerator();
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "EXPRESSION = EXPRESSION | SOMETHING"
+            });
 
-            generator.AddExpression("EXPRESSION = EXPRESSION | SOMETHING");
+            var parser = generator.GetParser();
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
         public void ParserGeneratorTest_IndirectLeftRecursion_Fail()
         {
-            var generator = new ParserGenerator();
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+",
+                "EXPRESSION = (MATH_EXPRESSION | FUNCTION_CALL | NUMBER | VARIABLE)",
+                "STATEMENT = (VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL) ';'",
 
-            generator.AddExpression("PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+");
-            generator.AddExpression("EXPRESSION = (MATH_EXPRESSION | FUNCTION_CALL | NUMBER | VARIABLE)");
-            generator.AddExpression("STATEMENT = (VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL) ';'");
+                "VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?",
+                "ASSIGNMENT = VARIABLE '=' EXPRESSION",
+                "FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'",
 
-            generator.AddExpression("VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?");
-            generator.AddExpression("ASSIGNMENT = VARIABLE '=' EXPRESSION");
-            generator.AddExpression("FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'");
+                //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
+                //"MATH_EXPRESSION = EQUALITY_EXPRESSION",
+                //"EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*",
+                //"ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*",
+                //"MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*",
+                //"PRIMARY = '(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY",
+                "MATH_EXPRESSION = EXPRESSION MATH_OP EXPRESSION",
+                "MATH_OP = ('+'|'-'|'*'|'/')",
 
-            //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
-            //generator.AddExpression("MATH_EXPRESSION = EQUALITY_EXPRESSION");
-            //generator.AddExpression("EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*");
-            //generator.AddExpression("ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*");
-            //generator.AddExpression("MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*");
-            //generator.AddExpression("PRIMARY = '(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY");
-            generator.AddExpression("MATH_EXPRESSION = EXPRESSION MATH_OP EXPRESSION");
-            generator.AddExpression("MATH_OP = ('+'|'-'|'*'|'/')");
+                "REGEX:NUMBER = '[0-9]+'",
+                "REGEX:VARIABLE = '[a-zA-Z]+'",
 
-            generator.AddExpression("REGEX:NUMBER = '[0-9]+'");
-            generator.AddExpression("REGEX:VARIABLE = '[a-zA-Z]+'");
-
-            generator.AddExpression("FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' '{' FUNCTION_BODY '}'");
-            generator.AddExpression("FUNCTION_BODY = (STATEMENT)* RETURN_STATEMENT");
-            generator.AddExpression("RETURN_STATEMENT = 'return' EXPRESSION ';'");
+                "FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' '{' FUNCTION_BODY '}'",
+                "FUNCTION_BODY = (STATEMENT)* RETURN_STATEMENT",
+                "RETURN_STATEMENT = 'return' EXPRESSION ';'"
+            });
 
             var parser = generator.GetParser();
         }
@@ -65,31 +70,32 @@ namespace Tests.GeneratorTests
         [TestMethod]
         public void ParserGeneratorTest_IndirectLeftRecursion_Fixed()
         {
-            var generator = new ParserGenerator();
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+",
+                "EXPRESSION = (MATH_EXPRESSION | FUNCTION_CALL | NUMBER | VARIABLE)",
+                "STATEMENT = (VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL) ';'",
 
-            generator.AddExpression("PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+");
-            generator.AddExpression("EXPRESSION = (MATH_EXPRESSION | FUNCTION_CALL | NUMBER | VARIABLE)");
-            generator.AddExpression("STATEMENT = (VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL) ';'");
+                "VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?",
+                "ASSIGNMENT = VARIABLE '=' EXPRESSION",
+                "FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'",
 
-            generator.AddExpression("VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?");
-            generator.AddExpression("ASSIGNMENT = VARIABLE '=' EXPRESSION");
-            generator.AddExpression("FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'");
+                //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
+                "MATH_EXPRESSION = EQUALITY_EXPRESSION",
+                "EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*",
+                "ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*",
+                "MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*",
+                "PRIMARY = ('(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY)",
+                //"MATH_EXPRESSION = EXPRESSION MATH_OP EXPRESSION",
+                //"MATH_OP = ('+'|'-'|'*'|'/')",
 
-            //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
-            generator.AddExpression("MATH_EXPRESSION = EQUALITY_EXPRESSION");
-            generator.AddExpression("EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*");
-            generator.AddExpression("ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*");
-            generator.AddExpression("MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*");
-            generator.AddExpression("PRIMARY = ('(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY)");
-            //generator.AddExpression("MATH_EXPRESSION = EXPRESSION MATH_OP EXPRESSION");
-            //generator.AddExpression("MATH_OP = ('+'|'-'|'*'|'/')");
+                "REGEX:NUMBER = '[0-9]+'",
+                "REGEX:VARIABLE = '[a-zA-Z]+'",
 
-            generator.AddExpression("REGEX:NUMBER = '[0-9]+'");
-            generator.AddExpression("REGEX:VARIABLE = '[a-zA-Z]+'");
-
-            generator.AddExpression("FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' '{' FUNCTION_BODY '}'");
-            generator.AddExpression("FUNCTION_BODY = (STATEMENT)* RETURN_STATEMENT");
-            generator.AddExpression("RETURN_STATEMENT = 'return' EXPRESSION ';'");
+                "FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' '{' FUNCTION_BODY '}'",
+                "FUNCTION_BODY = (STATEMENT)* RETURN_STATEMENT",
+                "RETURN_STATEMENT = 'return' EXPRESSION ';'"
+            });
 
             var parser = generator.GetParser();
         }

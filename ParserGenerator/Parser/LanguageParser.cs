@@ -13,22 +13,61 @@ namespace ParserGen.Parser
         private Dictionary<string, GrammarExpression> _expressionTable;
         private ILanguageTokenCreator _tokenCreator;
         private HashSet<string> _reservedWords;
+        private HashSet<string> _ignoreLiterals;
         
         private string _input;
         private string _currentToken;
 
-        public LanguageParser(Dictionary<string, GrammarExpression> expressionTable, ILanguageTokenCreator tokenCreator)
+        public LanguageParser(Dictionary<string, GrammarExpression> expressionTable, ILanguageTokenCreator tokenCreator, List<string> ignoreLiterals = null)
         {
             _expressionTable = expressionTable;
             _tokenCreator = tokenCreator;
 
             //Uses all literal tokens present in the given syntax as reserved keywords so that user supplied
             //regex expressions won't match language keywords or special purpose characters
-            _reservedWords = new HashSet<string>(
-                _expressionTable.Where(i => i.Value.Tokens != null).SelectMany(
-                    i => i.Value.Tokens.Where(t => t != null && t is LiteralGrammarToken).Select(t => ((LiteralGrammarToken)t).Text)
-                )
-            );
+            _reservedWords = new HashSet<string>();
+            foreach (var expression in _expressionTable.Select(e => e.Value))
+            {
+                if (expression.Tokens != null)
+                {
+                    foreach (var t in expression.Tokens)
+                    {
+                        FindReservedKeywords(t);
+                    }
+                }
+            }
+
+            if (ignoreLiterals == null) ignoreLiterals = new List<string>();
+
+            _ignoreLiterals = new HashSet<string>(ignoreLiterals.Union(new List<string>() { "(", ")", ",", ";" }));
+        }
+
+        private void FindReservedKeywords(IGrammarToken token)
+        {
+            if (token is LiteralGrammarToken)
+            {
+                _reservedWords.Add(((LiteralGrammarToken)token).Text);
+            }
+            else if (token is TokenListGrammarToken)
+            {
+                if (((TokenListGrammarToken)token).Tokens != null)
+                {
+                    foreach (var t in ((TokenListGrammarToken)token).Tokens)
+                    {
+                        FindReservedKeywords(t);
+                    }
+                }
+            }
+            else if (token is GroupGrammarToken)
+            {
+                if (((GroupGrammarToken)token).Tokens != null)
+                {
+                    foreach (var t in ((GroupGrammarToken)token).Tokens)
+                    {
+                        FindReservedKeywords(t);
+                    }
+                }
+            }
         }
 
         private void Scan()
@@ -144,8 +183,7 @@ namespace ParserGen.Parser
                 throw new Exception("Syntax error. Expecting: " + exprToken.Text);
             }
 
-            //TODO: let user provided TokenCreator decide what to exclude
-            if (_currentToken != "(" && _currentToken != ")" && _currentToken != ",")
+            if (!_ignoreLiterals.Contains(_currentToken))
             {
                 tokens.Add(_tokenCreator.Create(_currentToken));
             }

@@ -14,15 +14,16 @@ namespace Tests.ParserTests
         [TestMethod]
         public void LL_k_GrammarTest()
         {
-            var generator = new ParserGenerator();
-
-            generator.AddExpression("PROGRAM = EXPRESSION");
-            generator.AddExpression("EXPRESSION = (X|Y)");
-            generator.AddExpression("X = A B");
-            generator.AddExpression("Y = A C");
-            generator.AddExpression("A = 'a'");
-            generator.AddExpression("B = 'b'");
-            generator.AddExpression("C = 'c'");
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "PROGRAM = EXPRESSION",
+                "EXPRESSION = (X|Y)",
+                "X = A B",
+                "Y = A C",
+                "A = 'a'",
+                "B = 'b'",
+                "C = 'c'"
+            });
 
             var parser = generator.GetParser();
 
@@ -33,48 +34,61 @@ namespace Tests.ParserTests
         [TestMethod]
         public void C_like_Test()
         {
-            var generator = new ParserGenerator();
+            var generator = new ParserGenerator(new List<string>()
+            {
+                "PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+",
+                "EXPRESSION = BOOLEAN_EXPRESSION",
+                "STATEMENT = ((VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL|'return' EXPRESSION) ';' | CONDITIONAL)",
+                "VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?",
+                "ASSIGNMENT = VARIABLE '=' EXPRESSION",
+                "FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'",
 
-            generator.AddExpression("PROGRAM = (STATEMENT | FUNCTION_DEFINITION)+");
-            generator.AddExpression("EXPRESSION = (MATH_EXPRESSION | FUNCTION_CALL | NUMBER | VARIABLE)");
-            generator.AddExpression("STATEMENT = (VARIABLE_DEFINITION|ASSIGNMENT|FUNCTION_CALL) ';'");
+                //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
+                "BOOLEAN_EXPRESSION = EQUALITY_EXPRESSION (('&&'|'||') EQUALITY_EXPRESSION)*",
+                "EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!='|'<'|'>'|'<='|'>=') ADDITIVE_EXPRESSION)*",
+                "ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*",
+                "MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*",
+                "PRIMARY = ('(' BOOLEAN_EXPRESSION ')' | NUMBER | FUNCTION_CALL | VARIABLE | '-' PRIMARY)",
 
-            generator.AddExpression("VARIABLE_DEFINITION = 'var' VARIABLE ('=' EXPRESSION)?");
-            generator.AddExpression("ASSIGNMENT = VARIABLE '=' EXPRESSION");
-            generator.AddExpression("FUNCTION_CALL = VARIABLE '(' (EXPRESSION (',' EXPRESSION)*)? ')'");
+                "REGEX:NUMBER = '[0-9]+'",
+                "REGEX:VARIABLE = '[a-zA-Z]+'",
 
-            //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
-            generator.AddExpression("MATH_EXPRESSION = EQUALITY_EXPRESSION");
-            generator.AddExpression("EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*");
-            generator.AddExpression("ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*");
-            generator.AddExpression("MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*");
-            generator.AddExpression("PRIMARY = ('(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY)");
-
-            generator.AddExpression("REGEX:NUMBER = '[0-9]+'");
-            generator.AddExpression("REGEX:VARIABLE = '[a-zA-Z]+'");
-
-            generator.AddExpression("FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' '{' FUNCTION_BODY '}'");
-            generator.AddExpression("FUNCTION_BODY = (STATEMENT)* RETURN_STATEMENT");
-            generator.AddExpression("RETURN_STATEMENT = 'return' EXPRESSION ';'");
+                "FUNCTION_DEFINITION = VARIABLE '(' (VARIABLE (',' VARIABLE)*)? ')' FUNCTION_BODY",
+                "FUNCTION_BODY = '{' (STATEMENT)* '}'",
+            
+                "CONDITIONAL = IF (ELSEIF)* (ELSE)?",
+                "IF = 'if' '(' EXPRESSION ')' '{' (STATEMENT)* '}'",
+                "ELSEIF = 'else' 'if' '(' EXPRESSION ')' '{' (STATEMENT)* '}'", 
+                "ELSE = 'else' '{' (STATEMENT)* '}'"
+            });
 
             var parser = generator.GetParser();
 
             var tokens = parser.Parse(
-                @"var a = 1;
-                  Add(x, y) 
+                @"Add(x, y) 
                   {  
-                      return x + y; 
-                  }
-                  Mult(x, y)
-                  {
-                      var temp = x * y;
-                      return temp;
-                  }
-                  Avg(x, y, z)
-                  {
-                      return (x + y + z) / 3;
+                      return (x + y) / 2; 
                   }"
             );
+
+//            var tokens = parser.Parse(
+//                @"var a = (1 + 2 + 3) * 2;
+//                  var b = 2;
+//                  Add(x, y) 
+//                  {  
+//                      return x + y; 
+//                  }
+//                  Mult(x, y)
+//                  {
+//                      var temp = x * y;
+//                      return temp;
+//                  }
+//                  Avg(x, y, z)
+//                  {
+//                      return (x + y + z) * 2;
+//                  }
+//                  var x = Add(a, b);"
+//            );
         }
     }
 }

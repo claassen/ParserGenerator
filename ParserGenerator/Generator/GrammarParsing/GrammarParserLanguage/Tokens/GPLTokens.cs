@@ -4,57 +4,54 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ParserGen.Parser;
+using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens
 {
-    //public class GrammarToken : ILanguageSubToken
-    //{
-    //}
-
-    public class GPLExpressionToken : ILanguageSubToken
+    public class GPLExpressionToken : DefaultLanguageNonTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLIdentifierToken : ILanguageToken
+    public class GPLIdentifierToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLRegexIdentififerToken : ILanguageToken
+    public class GPLRegexIdentififerToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLRegexExpressionToken : ILanguageToken
+    public class GPLRegexExpressionToken : DefaultLanguageTerminalToken
     {
         public string Expression;
     }
 
-    public class GPLTokenToken : ILanguageToken
+    public class GPLTokenToken : DefaultLanguageTerminalToken
     {
     }
 
-    public class GPLExprNameToken : ILanguageToken
+    public class GPLExprNameToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLUserLiteralToken : ILanguageToken
+    public class GPLUserLiteralToken : DefaultLanguageTerminalToken
     {
         public string Text;
     }
 
-    public class GPLLiteralToken : ILanguageToken
+    public class GPLLiteralToken : DefaultLanguageTerminalToken
     {
         public string Text;
     }
 
-    public class GPLGroupToken : ILanguageSubToken
+    public class GPLGroupToken : DefaultLanguageNonTerminalToken
     {
     }
 
-    public class GPLTokenListToken : ILanguageSubToken
+    public class GPLTokenListToken : DefaultLanguageNonTerminalToken
     {
     }
 }
