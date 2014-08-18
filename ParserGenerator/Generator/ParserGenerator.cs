@@ -105,7 +105,18 @@ namespace ParserGen.Generator
 
                     for (int j = 0; j < _expressionTable.Count; j++)
                     {
-                        if (i == j) continue;
+                        if (i == j)
+                        {
+                            if (firstToken1 is ExpressionGrammarToken)
+                            {
+                                if (((ExpressionGrammarToken)firstToken1).ExpressionName == _expressionTable.ElementAt(j).Value.Name)
+                                {
+                                    throw new Exception("Left recursion detected");
+                                }
+                            }
+
+                            continue;
+                        } 
 
                         var exp2 = _expressionTable.ElementAt(j);
 

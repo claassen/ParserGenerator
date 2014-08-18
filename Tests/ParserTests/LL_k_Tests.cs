@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
+using ParserGen.Parser;
 
 namespace Tests.ParserTests
 {
@@ -31,8 +32,8 @@ namespace Tests.ParserTests
             var tokens2 = parser.Parse("a c");
         }
 
-        [TestMethod]
-        public void C_like_Test()
+
+        private LanguageParser GetCmParser()
         {
             var generator = new ParserGenerator(new List<string>()
             {
@@ -62,33 +63,82 @@ namespace Tests.ParserTests
                 "ELSE = 'else' '{' (STATEMENT)* '}'"
             });
 
-            var parser = generator.GetParser();
+            return generator.GetParser();
+        }
+
+        [TestMethod]
+        public void OperatorPrecedence_Test1()
+        {
+            var parser = GetCmParser();
 
             var tokens = parser.Parse(
                 @"Add(x, y) 
                   {  
+                      var test = 1 + 2 * 3 - 4 / 5;
+                     
                       return (x + y) / 2; 
                   }"
             );
+        }
 
-//            var tokens = parser.Parse(
-//                @"var a = (1 + 2 + 3) * 2;
-//                  var b = 2;
-//                  Add(x, y) 
-//                  {  
-//                      return x + y; 
-//                  }
-//                  Mult(x, y)
-//                  {
-//                      var temp = x * y;
-//                      return temp;
-//                  }
-//                  Avg(x, y, z)
-//                  {
-//                      return (x + y + z) * 2;
-//                  }
-//                  var x = Add(a, b);"
-//            );
+        [TestMethod]
+        public void OperatorPrecedence_Test2()
+        {
+            var parser = GetCmParser();
+
+            var tokens = parser.Parse(
+                @"Add(x, y) 
+                  {  
+                      var test = (1 + 2) * 3;
+
+                      return (x + y) / 2; 
+                  }"
+            );
+        }
+
+        [TestMethod]
+        public void OperatorPrecedence_Test3()
+        {
+            var parser = GetCmParser();
+
+            var tokens = parser.Parse(
+                @"var test = One() && Two();"
+            );
+        }
+
+        [TestMethod]
+        public void OperatorPrecedence_Test4()
+        {
+            var parser = GetCmParser();
+
+            var tokens = parser.Parse(
+                @"var test = 1 <= 2 != 3 > 4;"
+            );
+        }
+
+        [TestMethod]
+        public void MultipleStatements_Test()
+        {
+            var parser = GetCmParser();
+
+            var tokens = parser.Parse(
+                @"var a = (1 + 2 + 3) * 2;
+                  var b = 2;
+                  Add(x, y) 
+                  {  
+                      return x + y; 
+                  }
+                  Mult(x, y)
+                  {
+                      var temp = x * y;
+                      return temp;
+                  }
+                  Avg(x, y, z)
+                  {
+                      return (x + y + z) * 2;
+                  }
+                  var x = Add(a, b);"
+            );
         }
     }
 }

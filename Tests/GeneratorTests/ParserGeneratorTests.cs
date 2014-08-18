@@ -27,7 +27,7 @@ namespace Tests.GeneratorTests
         {
             var generator = new ParserGenerator(new List<string>()
             {
-                "EXPRESSION = EXPRESSION | SOMETHING"
+                "EXPRESSION = (EXPRESSION | SOMETHING)"
             });
 
             var parser = generator.GetParser();
@@ -54,7 +54,7 @@ namespace Tests.GeneratorTests
                 //"MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*",
                 //"PRIMARY = '(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY",
                 "MATH_EXPRESSION = EXPRESSION MATH_OP EXPRESSION",
-                "MATH_OP = ('+'|'-'|'*'|'/')",
+                "MATH_OP = ('+' | '-' | '*' | '/')",
 
                 "REGEX:NUMBER = '[0-9]+'",
                 "REGEX:VARIABLE = '[a-zA-Z]+'",
@@ -82,7 +82,7 @@ namespace Tests.GeneratorTests
 
                 //"Precendence climbing method" of representing order of operations (http://en.wikipedia.org/wiki/Operator-precedence_parser)
                 "MATH_EXPRESSION = EQUALITY_EXPRESSION",
-                "EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)*",
+                "EQUALITY_EXPRESSION = ADDITIVE_EXPRESSION (('=='|'!=') ADDITIVE_EXPRESSION)?",
                 "ADDITIVE_EXPRESSION = MULTIPLICATIVE_EXPRESSION (('+'|'-') MULTIPLICATIVE_EXPRESSION)*",
                 "MULTIPLICATIVE_EXPRESSION = PRIMARY (('*'|'/') PRIMARY)*",
                 "PRIMARY = ('(' MATH_EXPRESSION ')' | NUMBER | VARIABLE | '-' PRIMARY)",
