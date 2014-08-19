@@ -40,21 +40,14 @@ namespace ParserGen.Parser.Tokens
 
         public virtual ILanguageToken Create(string expressionName, List<ILanguageToken> tokens)
         {
-            if (tokens.Count == 1)
+            if (_userTokens != null && _userTokens.ContainsKey(expressionName))
             {
-                return tokens.First();
+                var userToken = (IUserLanguageNonTerminalToken)_userTokens[expressionName];
+                return userToken.Create(expressionName, tokens);
             }
             else
             {
-                if (_userTokens != null && _userTokens.ContainsKey(expressionName))
-                {
-                    var userToken = (IUserLanguageNonTerminalToken)_userTokens[expressionName];
-                    return userToken.Create(expressionName, tokens);
-                }
-                else
-                {
-                    return new DefaultLanguageNonTerminalToken() { Name = expressionName, Tokens = tokens };
-                }
+                return new DefaultLanguageNonTerminalToken() { Name = expressionName, Tokens = tokens };
             }
         }
     }

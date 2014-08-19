@@ -77,19 +77,49 @@ namespace Tests
 
             var tokens = parser.Parse("+ 1 2");
 
-            var mathExpression = (DefaultLanguageNonTerminalToken)tokens[0];
+            var program = (DefaultLanguageNonTerminalToken)tokens[0];
+            Assert.AreEqual("PROGRAM", program.Name);
+
+            var expr = (DefaultLanguageNonTerminalToken)program.Tokens[0];
+            Assert.AreEqual("EXPR", expr.Name);
+
+            var expression = (DefaultLanguageNonTerminalToken)expr.Tokens[0];
+            Assert.AreEqual("EXPRESSION", expression.Name);
+
+            var mathExpression = (DefaultLanguageNonTerminalToken)expression.Tokens[0];
             Assert.AreEqual("MATH_EXPRESSION", mathExpression.Name);
 
-            var mathOpToken = (DefaultLanguageTerminalToken)mathExpression.Tokens[0];
-            Assert.AreEqual("+", mathOpToken.Value);
+            var mathOp = (DefaultLanguageNonTerminalToken)mathExpression.Tokens[0];
+            Assert.AreEqual("MATH_OP", mathOp.Name);
 
-            var operand1 = (DefaultLanguageTerminalToken)mathExpression.Tokens[1];
-            Assert.AreEqual("NUMBER", operand1.Name);
-            Assert.AreEqual("1", operand1.Value);
+            var expr1 = (DefaultLanguageNonTerminalToken)mathExpression.Tokens[1];
+            Assert.AreEqual("EXPR", expr1.Name);
 
-            var operand2 = (DefaultLanguageTerminalToken)mathExpression.Tokens[2];
-            Assert.AreEqual("NUMBER", operand2.Name);
-            Assert.AreEqual("2", operand2.Value);
+            var expr2 = (DefaultLanguageNonTerminalToken)mathExpression.Tokens[2];
+            Assert.AreEqual("EXPR", expr2.Name);
+
+            var plus = (DefaultLanguageTerminalToken)mathOp.Tokens[0];
+            Assert.AreEqual("+", plus.Value);
+
+            var oneExpr = (DefaultLanguageNonTerminalToken)expr1.Tokens[0];
+            Assert.AreEqual("EXPRESSION", oneExpr.Name);
+
+            var oneValue = (DefaultLanguageNonTerminalToken)oneExpr.Tokens[0];
+            Assert.AreEqual("VALUE", oneValue.Name);
+
+            var oneNumber = (DefaultLanguageTerminalToken)oneValue.Tokens[0];
+            Assert.AreEqual("NUMBER", oneNumber.Name);
+            Assert.AreEqual("1", oneNumber.Value);
+
+            var twoExpr = (DefaultLanguageNonTerminalToken)expr2.Tokens[0];
+            Assert.AreEqual("EXPRESSION", twoExpr.Name);
+
+            var twoValue = (DefaultLanguageNonTerminalToken)twoExpr.Tokens[0];
+            Assert.AreEqual("VALUE", twoValue.Name);
+
+            var twoNumber = (DefaultLanguageTerminalToken)twoValue.Tokens[0];
+            Assert.AreEqual("NUMBER", twoNumber.Name);
+            Assert.AreEqual("2", twoNumber.Value);
         }
 
         [TestMethod]
