@@ -74,7 +74,7 @@ namespace ParserGen.Parser
         {
             //string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|[|]|;|,|\*)\s*|[\s[\]|\(\);,]");
 
-            string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|\|\||\||;|,|\*|&&|&)\s*|[\s[\]|\(\);,\*&]");
+            string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|\|\||\||;|,|\.|\*|&&|&)\s*|[\s[\]|\(\);,\.\*&]");
             
             _currentToken = tokens.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
 
