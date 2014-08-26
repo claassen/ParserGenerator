@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ParserGen.Parser.Tokens
 {
-    public class DefaultLanguageTokenCreator : ILanguageTokenCreator
+    internal class DefaultLanguageTokenCreator : ILanguageTokenCreator
     {
-        private Dictionary<string, IUserLanguageToken> _userTokens;
+        private Dictionary<string, ILanguageToken> _userTokens;
 
-        public DefaultLanguageTokenCreator(Dictionary<string, IUserLanguageToken> userTokens)
+        public DefaultLanguageTokenCreator(Dictionary<string, ILanguageToken> userTokens)
         {
             _userTokens = userTokens;
         }
@@ -29,7 +29,7 @@ namespace ParserGen.Parser.Tokens
         {
             if (_userTokens != null && _userTokens.ContainsKey(expressionName))
             {
-                var userToken = (IUserLanguageTerminalToken)_userTokens[expressionName];
+                var userToken = (ILanguageTerminalToken)_userTokens[expressionName];
                 return userToken.Create(expressionValue);
             }
             else
@@ -42,7 +42,7 @@ namespace ParserGen.Parser.Tokens
         {
             if (_userTokens != null && _userTokens.ContainsKey(expressionName))
             {
-                var userToken = (IUserLanguageNonTerminalToken)_userTokens[expressionName];
+                var userToken = (ILanguageNonTerminalToken)_userTokens[expressionName];
                 return userToken.Create(expressionName, tokens);
             }
             else

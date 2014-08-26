@@ -8,50 +8,50 @@ using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens
 {
-    public class GPLExpressionToken : DefaultLanguageNonTerminalToken
+    internal class GPLExpressionToken : DefaultLanguageNonTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLIdentifierToken : DefaultLanguageTerminalToken
+    internal class GPLIdentifierToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLRegexIdentififerToken : DefaultLanguageTerminalToken
+    internal class GPLRegexIdentififerToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLRegexExpressionToken : DefaultLanguageTerminalToken
+    internal class GPLRegexExpressionToken : DefaultLanguageTerminalToken
     {
         public string Expression;
     }
 
-    public class GPLTokenToken : DefaultLanguageTerminalToken
+    internal class GPLTokenToken : DefaultLanguageTerminalToken
     {
     }
 
-    public class GPLExprNameToken : DefaultLanguageTerminalToken
+    internal class GPLExprNameToken : DefaultLanguageTerminalToken
     {
         public string ExpressionName;
     }
 
-    public class GPLUserLiteralToken : DefaultLanguageTerminalToken
+    internal class GPLUserLiteralToken : DefaultLanguageTerminalToken
     {
         public string Text;
     }
 
-    public class GPLLiteralToken : DefaultLanguageTerminalToken
+    internal class GPLLiteralToken : DefaultLanguageTerminalToken
     {
         public string Text;
     }
 
-    public class GPLGroupToken : DefaultLanguageNonTerminalToken
+    internal class GPLGroupToken : DefaultLanguageNonTerminalToken
     {
     }
 
-    public class GPLTokenListToken : DefaultLanguageNonTerminalToken
+    internal class GPLTokenListToken : DefaultLanguageNonTerminalToken
     {
     }
 }

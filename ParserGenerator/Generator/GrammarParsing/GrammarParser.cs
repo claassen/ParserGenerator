@@ -10,7 +10,7 @@ using ParserGen.Parser;
 
 namespace ParserGen.Generator.GrammarParsing
 {
-    public class GrammarParser
+    internal class GrammarParser
     {
         //Documentation only
         private readonly string[] GPLExpressions = new string[]

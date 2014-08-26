@@ -8,7 +8,7 @@ using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens
 {
-    public class GPLTokenCreator : ILanguageTokenCreator
+    internal class GPLTokenCreator : ILanguageTokenCreator
     {
         public string RootExpressionName()
         {

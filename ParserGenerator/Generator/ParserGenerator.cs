@@ -12,7 +12,7 @@ namespace ParserGen.Generator
     public class ParserGenerator
     {
         private Dictionary<string, GrammarExpression> _expressionTable = new Dictionary<string, GrammarExpression>();
-        private Dictionary<string, IUserLanguageToken> _userTokens;
+        private Dictionary<string, ILanguageToken> _userTokens;
         private GrammarParser _parser;
 
         public ParserGenerator(List<GrammarExpression> grammar)
@@ -30,11 +30,11 @@ namespace ParserGen.Generator
             expressions.ForEach(e => AddExpression(e));
         }
 
-        public ParserGenerator(List<IUserLanguageToken> expressions)
+        public ParserGenerator(List<ILanguageToken> expressions)
         {
             Init();
 
-            _userTokens = new Dictionary<string, IUserLanguageToken>();
+            _userTokens = new Dictionary<string, ILanguageToken>();
 
             expressions.ForEach(e => AddExpression(e));
         }
@@ -51,9 +51,9 @@ namespace ParserGen.Generator
             _expressionTable.Add(expression.Name, expression);
         }
 
-        private void AddExpression(IUserLanguageToken t)
+        private void AddExpression(ILanguageToken t)
         {
-            var tokenAttr = t.GetType().GetCustomAttributes(typeof(UserLanguageToken), false).FirstOrDefault() as UserLanguageToken;
+            var tokenAttr = t.GetType().GetCustomAttributes(typeof(TokenExpression), false).FirstOrDefault() as TokenExpression;
             
             if (tokenAttr == null)
             {

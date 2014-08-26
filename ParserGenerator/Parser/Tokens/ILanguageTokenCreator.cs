@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ParserGen.Parser
+namespace ParserGen.Parser.Tokens
 {
     public interface ILanguageTokenCreator
     {

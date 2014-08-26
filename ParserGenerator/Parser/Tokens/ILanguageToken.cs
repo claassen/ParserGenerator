@@ -4,27 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ParserGen.Parser
+namespace ParserGen.Parser.Tokens
 {
     public interface ILanguageToken
     {
     }
 
-    
-
-    public abstract class IUserLanguageToken : ILanguageToken
+    public abstract class ILanguageTerminalToken : ILanguageToken
     {
+        public abstract ILanguageToken Create(string expressionValue);
     }
 
-    public abstract class IUserLanguageTerminalToken : IUserLanguageToken
-    {
-        public abstract IUserLanguageToken Create(string expressionValue);
-    }
-
-    public abstract class IUserLanguageNonTerminalToken : IUserLanguageToken
+    public abstract class ILanguageNonTerminalToken : ILanguageToken
     {
         public List<ILanguageToken> Tokens { get; set; }
 
-        public abstract IUserLanguageToken Create(string expressionValue, List<ILanguageToken> tokens);
+        public abstract ILanguageToken Create(string expressionValue, List<ILanguageToken> tokens);
     }
 }

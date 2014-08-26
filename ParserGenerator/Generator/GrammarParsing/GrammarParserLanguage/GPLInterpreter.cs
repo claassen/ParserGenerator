@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ParserGen.Generator.GrammarParsing.GrammarParserLanguage.Tokens;
 using ParserGen.Parser;
+using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Generator.GrammarParsing.GrammarParserLanguage
 {
-    public class GPLInterpreter
+    internal class GPLInterpreter
     {
         public GrammarExpression InterpretGPLTokens(List<ILanguageToken> tokens)
         {

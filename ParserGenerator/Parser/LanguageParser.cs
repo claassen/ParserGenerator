@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ParserGen.Generator.GrammarParsing;
+using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Parser
 {
