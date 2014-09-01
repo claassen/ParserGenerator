@@ -82,70 +82,47 @@ namespace ParserGen.Generator
             return new LanguageParser(_expressionTable, tokenCreator, ignoreLiterals);
         }
 
+        private string _currentLeftRecursionExprName;
+
         private void ValidateGrammar()
         {
-            for (int i = 0; i < _expressionTable.Count; i++)
+            foreach (var expression in _expressionTable)
             {
-                var exp1 = _expressionTable.ElementAt(i);
-
-                if (exp1.Value.Tokens != null)
+                if (expression.Value.Tokens != null)
                 {
-                    var firstToken1 = exp1.Value.Tokens.First();
+                    _currentLeftRecursionExprName = expression.Value.Name;
+                    CheckLeftRecursion(expression.Value.Tokens.First());
+                }
+            }
+        }
 
-                    while (firstToken1 is GroupGrammarToken || firstToken1 is TokenListGrammarToken)
+        private void CheckLeftRecursion(IGrammarToken token)
+        {
+            if (token is GroupGrammarToken)
+            {
+                foreach (var t in ((GroupGrammarToken)token).Tokens)
+                {
+                    CheckLeftRecursion(t);
+                }
+            }
+            else if (token is TokenListGrammarToken)
+            {
+                CheckLeftRecursion(((TokenListGrammarToken)token).Tokens.First());
+            }
+            else
+            {
+                if (token is ExpressionGrammarToken)
+                {
+                    if (((ExpressionGrammarToken)token).ExpressionName == _currentLeftRecursionExprName)
                     {
-                        if (firstToken1 is GroupGrammarToken)
-                        {
-                            firstToken1 = ((GroupGrammarToken)firstToken1).Tokens.First();
-                        }
-                        else
-                        {
-                            firstToken1 = ((TokenListGrammarToken)firstToken1).Tokens.First();
-                        }
+                        throw new InvalidGrammarException("Left recursion detected in grammar expression: " + _currentLeftRecursionExprName);
                     }
 
-                    for (int j = 0; j < _expressionTable.Count; j++)
+                    var exp = _expressionTable[((ExpressionGrammarToken)token).ExpressionName];
+
+                    if (exp.Tokens != null)
                     {
-                        if (i == j)
-                        {
-                            if (firstToken1 is ExpressionGrammarToken)
-                            {
-                                if (((ExpressionGrammarToken)firstToken1).ExpressionName == _expressionTable.ElementAt(j).Value.Name)
-                                {
-                                    throw new InvalidGrammarException("Left recursion detected");
-                                }
-                            }
-
-                            continue;
-                        } 
-
-                        var exp2 = _expressionTable.ElementAt(j);
-
-                        if (exp2.Value.Tokens != null)
-                        {
-                            var firstToken2 = exp2.Value.Tokens.First();
-
-                            while (firstToken2 is GroupGrammarToken || firstToken2 is TokenListGrammarToken)
-                            {
-                                if (firstToken2 is GroupGrammarToken)
-                                {
-                                    firstToken2 = ((GroupGrammarToken)firstToken2).Tokens.First();
-                                }
-                                else
-                                {
-                                    firstToken2 = ((TokenListGrammarToken)firstToken2).Tokens.First();
-                                }
-                            }
-
-                            if (firstToken1 is ExpressionGrammarToken && firstToken2 is ExpressionGrammarToken)
-                            {
-                                if (((ExpressionGrammarToken)firstToken1).ExpressionName == exp2.Value.Name &&
-                                    ((ExpressionGrammarToken)firstToken2).ExpressionName == exp1.Value.Name)
-                                {
-                                    throw new InvalidGrammarException("Mutual recursion");
-                                }
-                            }
-                        }
+                        CheckLeftRecursion(exp.Tokens.First());
                     }
                 }
             }
