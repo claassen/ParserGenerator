@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ParserGen.Generator.GrammarParsing;
+using ParserGen.Parser.Exceptions;
 using ParserGen.Parser.Tokens;
 
 namespace ParserGen.Parser
@@ -87,7 +88,7 @@ namespace ParserGen.Parser
 
         public List<ILanguageToken> Parse(string source)
         {
-            _input = source;
+            _input = source.Replace("\n", "").Replace("\r", "");
 
             List<ILanguageToken> tokens = new List<ILanguageToken>();
 
@@ -99,7 +100,7 @@ namespace ParserGen.Parser
 
             if (_currentToken != null)
             {
-                throw new Exception("Syntax error. Unexpected token: " + _currentToken);
+                throw new InvalidSyntaxException("Syntax error. Unexpected token: " + _currentToken);
             }
 
             return tokens;
@@ -118,7 +119,7 @@ namespace ParserGen.Parser
                 }
                 else
                 {
-                    throw new Exception("Syntax error. Expecting: " + ((RegexExpression)expression).Name);
+                    throw new InvalidSyntaxException("Syntax error. Expecting: " + ((RegexExpression)expression).Name);
                 }
             }
             else
@@ -129,7 +130,7 @@ namespace ParserGen.Parser
                 {
                     if (!IsMatch(exprToken))
                     {
-                        throw new Exception("Syntax error. Expecting: " + exprToken.ToString());
+                        throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString());
                     }
 
                     ParseSyntaxToken(exprToken, subTokens);
@@ -165,7 +166,7 @@ namespace ParserGen.Parser
             {
                 if (!IsMatch(t))
                 {
-                    throw new Exception("Syntax error. Expecting: " + t.ToString());
+                    throw new InvalidSyntaxException("Syntax error. Expecting: " + t.ToString());
                 }
 
                 ParseSyntaxToken(t, tokens);
@@ -183,7 +184,7 @@ namespace ParserGen.Parser
         {
             if (!IsMatch(exprToken))
             {
-                throw new Exception("Syntax error. Expecting: " + exprToken.Text);
+                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.Text);
             }
 
             if (!_ignoreLiterals.Contains(_currentToken))
@@ -220,7 +221,7 @@ namespace ParserGen.Parser
                             SAVED_TOKEN = _currentToken;
                             break;
                         }
-                        catch
+                        catch(InvalidSyntaxException ex)
                         {
                             //Backtrack
                             _input = SAVED_INPUT;
@@ -237,7 +238,7 @@ namespace ParserGen.Parser
 
             if (!globalSuccess && (exprToken.RepeatType != TokenRepeatType.ZeroOrMore && exprToken.RepeatType != TokenRepeatType.Optional))
             {
-                throw new Exception("Syntax error. Expecting: " + exprToken.ToString());
+                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString());
             }
         }
 
@@ -285,7 +286,7 @@ namespace ParserGen.Parser
                        groupToken.RepeatType == TokenRepeatType.ZeroOrMore;
             }
 
-            throw new Exception("Unknown SyntaxToken type");
+            throw new InvalidSyntaxException("Unknown SyntaxToken type");
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
+using ParserGen.Generator.Exceptions;
+using ParserGen.Parser.Exceptions;
 
 namespace Tests.GeneratorTests
 {
@@ -12,7 +14,7 @@ namespace Tests.GeneratorTests
     public class ParserGeneratorTests
     {
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidSyntaxException))]
         public void ParserGeneratorTest_InvalidExpression_Fail()
         {
             var generator = new ParserGenerator(new List<string>()
@@ -22,7 +24,7 @@ namespace Tests.GeneratorTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidGrammarException))]
         public void ParserGeneratorTest_LeftRecursion_Fail()
         {
             var generator = new ParserGenerator(new List<string>()
@@ -34,7 +36,7 @@ namespace Tests.GeneratorTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidGrammarException))]
         public void ParserGeneratorTest_IndirectLeftRecursion_Fail()
         {
             var generator = new ParserGenerator(new List<string>()

@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
 using ParserGen.Generator.GrammarParsing;
 using ParserGen.Parser;
+using ParserGen.Parser.Exceptions;
 using ParserGen.Parser.Tokens;
 
 namespace Tests
@@ -36,7 +37,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidSyntaxException))]
         public void FunctionalLanguageTest_MissingOpenParen()
         {
             var parser = CreateParser();
@@ -45,7 +46,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidSyntaxException))]
         public void FunctionalLanguageTest_MissingCloseParen()
         {
             var parser = CreateParser();
@@ -62,7 +63,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidSyntaxException))]
         public void FunctionalLanguageTest_ManyNestedParensMismatched()
         {
             var parser = CreateParser();

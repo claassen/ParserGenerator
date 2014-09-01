@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ParserGen.Generator.Exceptions;
 using ParserGen.Generator.GrammarParsing;
 using ParserGen.Parser;
 using ParserGen.Parser.Tokens;
@@ -57,7 +58,7 @@ namespace ParserGen.Generator
             
             if (tokenAttr == null)
             {
-                throw new Exception("Missing [UserLanguageToken] class attribute.");
+                throw new InvalidGrammarException("Missing [UserLanguageToken] class attribute.");
             }
 
             string name = tokenAttr.Name;
@@ -111,7 +112,7 @@ namespace ParserGen.Generator
                             {
                                 if (((ExpressionGrammarToken)firstToken1).ExpressionName == _expressionTable.ElementAt(j).Value.Name)
                                 {
-                                    throw new Exception("Left recursion detected");
+                                    throw new InvalidGrammarException("Left recursion detected");
                                 }
                             }
 
@@ -141,7 +142,7 @@ namespace ParserGen.Generator
                                 if (((ExpressionGrammarToken)firstToken1).ExpressionName == exp2.Value.Name &&
                                     ((ExpressionGrammarToken)firstToken2).ExpressionName == exp1.Value.Name)
                                 {
-                                    throw new Exception("Mutual recursion");
+                                    throw new InvalidGrammarException("Mutual recursion");
                                 }
                             }
                         }

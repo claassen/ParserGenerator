@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ParserGen.Generator;
 using ParserGen.Parser;
+using ParserGen.Parser.Exceptions;
 
 namespace Tests.ParserTests
 {
@@ -29,7 +30,7 @@ namespace Tests.ParserTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(InvalidSyntaxException))]
         public void ImperativeLanguageTest_MissingSemicolon()
         {
             var parser = CreateParser();

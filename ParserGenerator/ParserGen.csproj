@@ -44,11 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator\Exceptions\InvalidGrammarException.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarExpression.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\GPLInterpreter.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GPLTokens.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarParserLanguage\Tokens\GPLTokenCreator.cs" />
     <Compile Include="Generator\GrammarParsing\GrammarTokens.cs" />
+    <Compile Include="Parser\Exceptions\InvalidSyntaxException.cs" />
     <Compile Include="Parser\Tokens\DefaultLanguageTokenCreator.cs" />
     <Compile Include="Parser\Tokens\DefaultLanguageToken.cs" />
     <Compile Include="Parser\Tokens\ILanguageToken.cs" />
