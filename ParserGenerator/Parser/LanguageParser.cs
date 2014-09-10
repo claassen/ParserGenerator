@@ -94,7 +94,7 @@ namespace ParserGen.Parser
             };
 
             string splitRegex = String.Format(
-                @"\s*('[^']+'|{0})\s*|[{1}]",
+                @"\s*('[^']+'|""[^""]*""|{0})\s*|[{1}]",
                 String.Join("|", delims.Select(d => Regex.Escape(d))),
                 String.Join("", delims.Select(d => Regex.Escape(d)))
             );
