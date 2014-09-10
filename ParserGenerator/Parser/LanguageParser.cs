@@ -20,6 +20,8 @@ namespace ParserGen.Parser
         private string _input;
         private string _currentToken;
 
+        private InvalidSyntaxException lastException;
+
         public LanguageParser(Dictionary<string, GrammarExpression> expressionTable, ILanguageTokenCreator tokenCreator, List<string> ignoreLiterals = null)
         {
             _expressionTable = expressionTable;
@@ -72,12 +74,33 @@ namespace ParserGen.Parser
             }
         }
 
+        private InvalidSyntaxException GetRootCauseException(InvalidSyntaxException ex)
+        {
+            InvalidSyntaxException rootCause = ex;
+
+            while (rootCause.InnerException != null)
+            {
+                rootCause = (InvalidSyntaxException)rootCause.InnerException;
+            }
+
+            return rootCause;
+        }
+
         private void Scan()
         {
-            //string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|[|]|;|,|\*)\s*|[\s[\]|\(\);,]");
+            string[] delims = new string[]
+            {
+                "(", ")", "[", "]", "||", "|", "&&", "&", ";", ".", "*", "->", "-", " ", ",", "==", "!=", "<=", ">=", "<", ">", "="
+            };
 
-            string[] tokens = Regex.Split(_input, @"\s*('[^']+'|[()]|[[\]]|\|\||\||;|,|\.|\*|&&|&)\s*|[\s[\]|\(\);,\.\*&]");
-            
+            string splitRegex = String.Format(
+                @"\s*('[^']+'|{0})\s*|[{1}]",
+                String.Join("|", delims.Select(d => Regex.Escape(d))),
+                String.Join("", delims.Select(d => Regex.Escape(d)))
+            );
+
+            string[] tokens = Regex.Split(_input, splitRegex);
+
             _currentToken = tokens.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
 
             if (!string.IsNullOrEmpty(_currentToken))
@@ -86,8 +109,24 @@ namespace ParserGen.Parser
             }
         }
 
+        private int GetCurrentSourceColumn()
+        {
+            if (originalSrc != null && _input != null && _currentToken != null)
+            {
+                return originalSrc.Length - _input.Length - _currentToken.Length;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        private string originalSrc;
+
         public List<ILanguageToken> Parse(string source)
         {
+            originalSrc = source;
+
             _input = source.Replace("\n", "").Replace("\r", "");
 
             List<ILanguageToken> tokens = new List<ILanguageToken>();
@@ -96,11 +135,25 @@ namespace ParserGen.Parser
 
             Scan();
 
-            ParseSyntaxExpression(_expressionTable[ROOT_EXPRESSION], tokens);
+            try
+            {
+                ParseSyntaxExpression(_expressionTable[ROOT_EXPRESSION], tokens);
+            }
+            catch (InvalidSyntaxException ex)
+            {
+                throw GetRootCauseException(ex);
+            }
 
             if (_currentToken != null)
             {
-                throw new InvalidSyntaxException("Syntax error. Unexpected token: " + _currentToken);
+                if (lastException != null)
+                {
+                    throw GetRootCauseException(lastException);
+                }
+                else
+                {
+                    throw new InvalidSyntaxException("Syntax error. Unexpected token: " + _currentToken, GetCurrentSourceColumn());
+                }
             }
 
             return tokens;
@@ -119,7 +172,7 @@ namespace ParserGen.Parser
                 }
                 else
                 {
-                    throw new InvalidSyntaxException("Syntax error. Expecting: " + ((RegexExpression)expression).Name);
+                    throw new InvalidSyntaxException("Syntax error. Expecting: " + ((RegexExpression)expression).Name, GetCurrentSourceColumn());
                 }
             }
             else
@@ -130,7 +183,7 @@ namespace ParserGen.Parser
                 {
                     if (!IsMatch(exprToken))
                     {
-                        throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString());
+                        throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString(), GetCurrentSourceColumn());
                     }
 
                     ParseSyntaxToken(exprToken, subTokens);
@@ -166,7 +219,7 @@ namespace ParserGen.Parser
             {
                 if (!IsMatch(t))
                 {
-                    throw new InvalidSyntaxException("Syntax error. Expecting: " + t.ToString());
+                    throw new InvalidSyntaxException("Syntax error. Expecting: " + t.ToString(), GetCurrentSourceColumn());
                 }
 
                 ParseSyntaxToken(t, tokens);
@@ -184,7 +237,7 @@ namespace ParserGen.Parser
         {
             if (!IsMatch(exprToken))
             {
-                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.Text);
+                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.Text, GetCurrentSourceColumn());
             }
 
             if (!_ignoreLiterals.Contains(_currentToken))
@@ -201,6 +254,8 @@ namespace ParserGen.Parser
 
             string SAVED_INPUT = _input;
             string SAVED_TOKEN = _currentToken;
+
+            InvalidSyntaxException lastInnerException = null;
 
             while (true)
             {
@@ -226,6 +281,8 @@ namespace ParserGen.Parser
                             //Backtrack
                             _input = SAVED_INPUT;
                             _currentToken = SAVED_TOKEN;
+
+                            lastInnerException = ex;
                         }
                     }
                 }
@@ -238,7 +295,8 @@ namespace ParserGen.Parser
 
             if (!globalSuccess && (exprToken.RepeatType != TokenRepeatType.ZeroOrMore && exprToken.RepeatType != TokenRepeatType.Optional))
             {
-                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString());
+                lastException = new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString(), GetCurrentSourceColumn(), lastInnerException);
+                throw lastException;
             }
         }
 
@@ -286,7 +344,7 @@ namespace ParserGen.Parser
                        groupToken.RepeatType == TokenRepeatType.ZeroOrMore;
             }
 
-            throw new InvalidSyntaxException("Unknown SyntaxToken type");
+            throw new InvalidSyntaxException("Unknown SyntaxToken type", GetCurrentSourceColumn());
         }
     }
 }

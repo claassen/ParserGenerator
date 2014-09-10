@@ -91,10 +91,13 @@ namespace ParserGen.Generator
                 if (expression.Value.Tokens != null)
                 {
                     _currentLeftRecursionExprName = expression.Value.Name;
+                    _checkedExpressions = new HashSet<string>();
                     CheckLeftRecursion(expression.Value.Tokens.First());
                 }
             }
         }
+
+        private HashSet<string> _checkedExpressions;
 
         private void CheckLeftRecursion(IGrammarToken token)
         {
@@ -107,7 +110,10 @@ namespace ParserGen.Generator
             }
             else if (token is TokenListGrammarToken)
             {
-                CheckLeftRecursion(((TokenListGrammarToken)token).Tokens.First());
+                //if (((TokenListGrammarToken)token).Tokens.Count == 1)
+                //{
+                    CheckLeftRecursion(((TokenListGrammarToken)token).Tokens.First());
+                //}
             }
             else
             {
@@ -118,11 +124,16 @@ namespace ParserGen.Generator
                         throw new InvalidGrammarException("Left recursion detected in grammar expression: " + _currentLeftRecursionExprName);
                     }
 
-                    var exp = _expressionTable[((ExpressionGrammarToken)token).ExpressionName];
-
-                    if (exp.Tokens != null)
+                    if(!_checkedExpressions.Contains(((ExpressionGrammarToken)token).ExpressionName))
                     {
-                        CheckLeftRecursion(exp.Tokens.First());
+                        _checkedExpressions.Add(((ExpressionGrammarToken)token).ExpressionName);
+
+                        var exp = _expressionTable[((ExpressionGrammarToken)token).ExpressionName];
+
+                        if (exp.Tokens != null)
+                        {
+                            CheckLeftRecursion(exp.Tokens.First());
+                        }
                     }
                 }
             }
