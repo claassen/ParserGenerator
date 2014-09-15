@@ -58,7 +58,7 @@ namespace ParserGen.Generator
             
             if (tokenAttr == null)
             {
-                throw new InvalidGrammarException("Missing [UserLanguageToken] class attribute.");
+                throw new InvalidGrammarException("Missing [TokenExpression] class attribute.");
             }
 
             string name = tokenAttr.Name;
