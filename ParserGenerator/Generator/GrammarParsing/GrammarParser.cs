@@ -208,7 +208,7 @@ namespace ParserGen.Generator.GrammarParsing
 
         public GrammarExpression ParseGrammarExpression(string input)
         {
-            var tokens = _parser.Parse(input);
+            var tokens = _parser.Parse(input, "EXPRESSION");
 
             return _interpreter.InterpretGPLTokens(tokens);
         }

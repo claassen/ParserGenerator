@@ -15,11 +15,6 @@ namespace ParserGen.Parser.Tokens
             _userTokens = userTokens;
         }
 
-        public virtual string RootExpressionName()
-        {
-            return "PROGRAM";
-        }
-
         public virtual ILanguageToken Create(string literalToken)
         {
             return new DefaultLanguageTerminalToken() { Name = "Literal Token", Value = literalToken };

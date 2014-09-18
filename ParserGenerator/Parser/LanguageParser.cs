@@ -105,7 +105,7 @@ namespace ParserGen.Parser
 
             if (!string.IsNullOrEmpty(_currentToken))
             {
-                _input = _input.Substring(_currentToken.Length).TrimStart();
+                _input = _input.TrimStart().Substring(_currentToken.Length);//.TrimStart();
             }
         }
 
@@ -123,7 +123,7 @@ namespace ParserGen.Parser
 
         private string originalSrc;
 
-        public List<ILanguageToken> Parse(string source)
+        public List<ILanguageToken> Parse(string source, string rootExpressionName = "PROGRAM")
         {
             originalSrc = source;
 
@@ -131,13 +131,11 @@ namespace ParserGen.Parser
 
             List<ILanguageToken> tokens = new List<ILanguageToken>();
 
-            string ROOT_EXPRESSION = _tokenCreator.RootExpressionName();
-
             Scan();
 
             try
             {
-                ParseSyntaxExpression(_expressionTable[ROOT_EXPRESSION], tokens);
+                ParseSyntaxExpression(_expressionTable[rootExpressionName], tokens);
             }
             catch (InvalidSyntaxException ex)
             {
@@ -163,10 +161,13 @@ namespace ParserGen.Parser
         {
             if (expression is RegexExpression)
             {
-                if (_currentToken != null &&
-                    Regex.IsMatch(_currentToken, ((RegexExpression)expression).Expression) &&
-                    !_reservedWords.Contains(_currentToken))
+                if (_currentToken != null && Regex.IsMatch(_currentToken, ((RegexExpression)expression).Expression))
                 {
+                    if (_reservedWords.Contains(_currentToken))
+                    {
+                        throw new InvalidSyntaxException("Use of reserved keyword: " + _currentToken, GetCurrentSourceColumn());
+                    }
+
                     tokens.Add(_tokenCreator.Create(expression.Name, _currentToken));
                     Scan();
                 }
@@ -260,7 +261,7 @@ namespace ParserGen.Parser
             while (true)
             {
                 bool success = false;
-
+                
                 foreach (IGrammarToken t in exprToken.Tokens)
                 {
                     if (IsMatch(t))
@@ -274,6 +275,7 @@ namespace ParserGen.Parser
                             globalSuccess = true;
                             SAVED_INPUT = _input;
                             SAVED_TOKEN = _currentToken;
+
                             break;
                         }
                         catch(InvalidSyntaxException ex)
@@ -312,9 +314,7 @@ namespace ParserGen.Parser
 
                 if (expression is RegexExpression)
                 {
-                    return _currentToken != null &&
-                    Regex.IsMatch(_currentToken, ((RegexExpression)expression).Expression) &&
-                    !_reservedWords.Contains(_currentToken);
+                    return _currentToken != null && Regex.IsMatch(_currentToken, ((RegexExpression)expression).Expression);
                 }
                 else
                 {
