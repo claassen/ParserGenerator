@@ -105,7 +105,7 @@ namespace ParserGen.Parser
 
             if (!string.IsNullOrEmpty(_currentToken))
             {
-                _input = _input.TrimStart().Substring(_currentToken.Length);//.TrimStart();
+                _input = _input.TrimStart().Substring(_currentToken.Length);
             }
         }
 
@@ -173,7 +173,8 @@ namespace ParserGen.Parser
                 }
                 else
                 {
-                    throw new InvalidSyntaxException("Syntax error. Expecting: " + ((RegexExpression)expression).Name, GetCurrentSourceColumn());
+                    lastException = new InvalidSyntaxException("Syntax error: " + _currentToken + ", Expecting: " + ((RegexExpression)expression).Name, GetCurrentSourceColumn(), lastException);
+                    throw lastException;
                 }
             }
             else
@@ -184,7 +185,8 @@ namespace ParserGen.Parser
                 {
                     if (!IsMatch(exprToken))
                     {
-                        throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString(), GetCurrentSourceColumn());
+                        lastException = new InvalidSyntaxException("Syntax error: " + _currentToken + ", Expecting: " + exprToken.ToString(), GetCurrentSourceColumn(), lastException);
+                        throw lastException;
                     }
 
                     ParseSyntaxToken(exprToken, subTokens);
@@ -220,7 +222,8 @@ namespace ParserGen.Parser
             {
                 if (!IsMatch(t))
                 {
-                    throw new InvalidSyntaxException("Syntax error. Expecting: " + t.ToString(), GetCurrentSourceColumn());
+                    lastException = new InvalidSyntaxException("Syntax error: " + _currentToken + ", Expecting: " + t.ToString(), GetCurrentSourceColumn(), lastException);
+                    throw lastException;
                 }
 
                 ParseSyntaxToken(t, tokens);
@@ -238,7 +241,8 @@ namespace ParserGen.Parser
         {
             if (!IsMatch(exprToken))
             {
-                throw new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.Text, GetCurrentSourceColumn());
+                lastException = new InvalidSyntaxException("Syntax error: " + _currentToken + ", Expecting: " + exprToken.Text, GetCurrentSourceColumn(), lastException);
+                throw lastException;
             }
 
             if (!_ignoreLiterals.Contains(_currentToken))
@@ -297,7 +301,7 @@ namespace ParserGen.Parser
 
             if (!globalSuccess && (exprToken.RepeatType != TokenRepeatType.ZeroOrMore && exprToken.RepeatType != TokenRepeatType.Optional))
             {
-                lastException = new InvalidSyntaxException("Syntax error. Expecting: " + exprToken.ToString(), GetCurrentSourceColumn(), lastInnerException);
+                lastException = new InvalidSyntaxException("Syntax error: " + _currentToken + ", Expecting: " + exprToken.ToString(), GetCurrentSourceColumn(), lastInnerException);
                 throw lastException;
             }
         }
