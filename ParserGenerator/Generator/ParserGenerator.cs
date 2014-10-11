@@ -64,6 +64,11 @@ namespace ParserGen.Generator
             string name = tokenAttr.Name;
             string pattern = tokenAttr.Pattern;
 
+            if (t is ILanguageTerminalToken && !name.StartsWith("REGEX:"))
+            {
+                name = "REGEX:" + name;
+            }
+
             GrammarExpression expression = _parser.ParseGrammarExpression(name + " = " + pattern);
 
             _expressionTable.Add(expression.Name, expression);
